@@ -17,7 +17,7 @@ const storage = multer.diskStorage({
 });
 const upload = multer({ storage });
 
-// In-memory data (for demonstration)
+// In-memory data
 let users = [];
 let transactions = [];
 let testimonials = [
@@ -27,23 +27,28 @@ let testimonials = [
   { name: "Kaylor", message: "Reliable and trustworthy." }
 ];
 
-// Home/Dashboard page route
+// Home/Dashboard
 app.get("/", (req, res) => {
   res.sendFile(path.join(__dirname, "public", "index.html"));
 });
 
 // Registration
 app.post("/register", (req, res) => {
-  const { username, password, phone } = req.body;
-  if (!username || !password || !phone) return res.json({ message: "All fields required" });
-  users.push({ username, password, phone });
+  const { username, phone, password } = req.body;
+  if (!username || !phone || !password) return res.json({ message: "All fields required" });
+
+  // Check duplicate phone
+  const exists = users.find(u => u.phone === phone);
+  if (exists) return res.json({ message: "Phone number already registered" });
+
+  users.push({ username, phone, password });
   res.json({ message: "Registration successful!" });
 });
 
 // Login
 app.post("/login", (req, res) => {
-  const { username, password } = req.body;
-  const user = users.find(u => u.username === username && u.password === password);
+  const { phone, password } = req.body;
+  const user = users.find(u => u.phone === phone && u.password === password);
   if (user) res.json({ message: "Login successful!" });
   else res.json({ message: "Invalid credentials" });
 });
@@ -74,12 +79,12 @@ app.get("/live-users", (req, res) => {
   res.json({ count: users.length });
 });
 
-// Live testimonials
+// Testimonials
 app.get("/testimonials", (req, res) => {
   res.json(testimonials);
 });
 
-// 404 handler
+// 404
 app.use((req, res) => res.status(404).send("Page not found"));
 
 // Start server

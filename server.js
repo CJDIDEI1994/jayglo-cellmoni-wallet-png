@@ -27,27 +27,22 @@ let testimonials = [
   { name: "Kaylor", message: "Reliable and trustworthy." }
 ];
 
-// Home/Dashboard
+// Home/Dashboard page
 app.get("/", (req, res) => {
   res.sendFile(path.join(__dirname, "public", "index.html"));
 });
 
 // Registration
 app.post("/register", (req, res) => {
-  const { username, phone, password } = req.body;
+  const { username, phone, password } = req.body; // updated field names
   if (!username || !phone || !password) return res.json({ message: "All fields required" });
-
-  // Check duplicate phone
-  const exists = users.find(u => u.phone === phone);
-  if (exists) return res.json({ message: "Phone number already registered" });
-
   users.push({ username, phone, password });
   res.json({ message: "Registration successful!" });
 });
 
 // Login
 app.post("/login", (req, res) => {
-  const { phone, password } = req.body;
+  const { phone, password } = req.body; // updated field name
   const user = users.find(u => u.phone === phone && u.password === password);
   if (user) res.json({ message: "Login successful!" });
   else res.json({ message: "Invalid credentials" });
@@ -70,21 +65,15 @@ app.post("/withdraw", upload.single("withdrawProof"), (req, res) => {
 });
 
 // Transaction history
-app.get("/history", (req, res) => {
-  res.json(transactions);
-});
+app.get("/history", (req, res) => res.json(transactions));
 
 // Live user count
-app.get("/live-users", (req, res) => {
-  res.json({ count: users.length });
-});
+app.get("/live-users", (req, res) => res.json({ count: users.length }));
 
-// Testimonials
-app.get("/testimonials", (req, res) => {
-  res.json(testimonials);
-});
+// Live testimonials
+app.get("/testimonials", (req, res) => res.json(testimonials));
 
-// 404
+// 404 handler
 app.use((req, res) => res.status(404).send("Page not found"));
 
 // Start server

@@ -1,99 +1,147 @@
+/* ===== General Reset ===== */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
 body {
-    font-family: 'Arial', sans-serif;
-    margin: 0;
-    padding: 0;
-    background-color: #fff0f0;
-    color: #333;
+  font-family: Arial, sans-serif;
+  background-color: #ffe6e6;
+  color: #990000;
+  line-height: 1.6;
 }
 
-/* Header */
+/* ===== Header ===== */
 .header {
-    text-align: center;
-    background-color: #ff4d4d;
-    color: white;
-    padding: 15px;
+  text-align: center;
+  padding: 15px;
+  background-color: #ffcccc;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  animation: fadeDown 0.8s ease-out;
 }
 
-/* Promo banner */
+.header h1 {
+  font-size: 1.8rem;
+}
+
+.logo-small {
+  width: 80px;
+  margin-bottom: 10px;
+}
+
+/* ===== Marquee Promo Banner ===== */
 .promo-banner {
-    background-color: #ff9999;
-    color: white;
-    font-weight: bold;
-    padding: 5px 0;
+  background-color: #ffcccc;
+  padding: 8px;
+  color: #990000;
+  font-weight: bold;
+  font-size: 0.95rem;
+  border-top: 1px solid #e6b3b3;
+  border-bottom: 1px solid #e6b3b3;
 }
 
-/* Form container */
+/* ===== Forms ===== */
 .form-container {
-    max-width: 400px;
-    margin: 20px auto;
-    padding: 20px;
-    border-radius: 10px;
-    background-color: #fff;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+  max-width: 360px;
+  margin: 20px auto;
+  padding: 20px;
+  background-color: white;
+  border-radius: 12px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.15);
+  animation: fadeUp 0.8s ease-out;
 }
 
-/* Inputs & buttons */
-input, select, button {
-    width: 100%;
-    padding: 10px;
-    margin: 10px 0;
-    border-radius: 5px;
-    border: 1px solid #ff4d4d;
+.form-container h2 {
+  text-align: center;
+  margin-bottom: 15px;
 }
 
-button.submit-btn {
-    background-color: #ff4d4d;
-    color: white;
-    font-weight: bold;
-    cursor: pointer;
+.form-container label {
+  display: block;
+  margin: 8px 0 4px;
 }
 
-/* Footer WhatsApp */
+.form-container input {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  outline: none;
+  transition: 0.3s;
+}
+
+.form-container input:focus {
+  border-color: #ff4d4d;
+  box-shadow: 0 0 5px rgba(255, 77, 77, 0.5);
+}
+
+/* ===== Buttons ===== */
+.submit-btn, .whatsapp-btn {
+  background-color: #ff4d4d;
+  color: white;
+  border: none;
+  padding: 10px;
+  margin-top: 12px;
+  width: 100%;
+  cursor: pointer;
+  border-radius: 6px;
+  font-weight: bold;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.submit-btn:hover, .whatsapp-btn:hover {
+  background-color: #e60000;
+  transform: scale(1.05);
+}
+
+/* ===== Footer ===== */
 .footer {
-    text-align: center;
-    padding: 10px;
+  text-align: center;
+  margin-top: 25px;
 }
 
-button.whatsapp-btn {
-    background-color: #25D366;
-    color: white;
-    border: none;
-    padding: 10px 20px;
-    border-radius: 5px;
-    cursor: pointer;
+.whatsapp-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background-color: #25D366;
+  color: white;
+  padding: 8px 12px;
+  border-radius: 6px;
+  text-decoration: none;
+  font-weight: bold;
+  transition: background-color 0.3s ease, transform 0.2s ease;
 }
 
-/* Navigation */
-nav {
-    display: flex;
-    justify-content: center;
-    gap: 10px;
-    margin-bottom: 15px;
-}
-nav a {
-    text-decoration: none;
-    padding: 8px 12px;
-    background-color: #ff4d4d;
-    color: white;
-    border-radius: 5px;
+.whatsapp-link:hover {
+  background-color: #1ebc57;
+  transform: scale(1.05);
 }
 
-/* Live users/testimonials */
-.live-stats {
-    text-align: center;
-    margin: 15px 0;
-    font-size: 14px;
-    color: #ff3333;
+.whatsapp-logo {
+  width: 20px;
+  height: 20px;
 }
 
-.testimonials {
-    background-color: #ffe6e6;
-    color: #ff0000;
-    padding: 5px 0;
-    font-weight: bold;
+/* ===== Animations ===== */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(15px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
-/* Mobile scaling */
-@media (max-width: 500px) {
-    .form-container { margin: 10px; padding: 15px; }
+@keyframes fadeDown {
+  from { opacity: 0; transform: translateY(-15px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ===== Mobile Responsive ===== */
+@media (max-width: 480px) {
+  .form-container {
+    padding: 15px;
+    margin: 10px;
   }
+  .header h1 {
+    font-size: 1.4rem;
+  }
+}

@@ -34,26 +34,15 @@ app.get("/", (req, res) => {
 
 // Registration
 app.post("/register", (req, res) => {
-  const { username, phone, password } = req.body;
-  if (!username || !phone || !password) {
-    return res.json({ message: "All fields required" });
-  }
-
-  // Check if user already exists
-  const existingUser = users.find(u => u.username === username || u.phone === phone);
-  if (existingUser) {
-    return res.json({ message: "User already exists" });
-  }
-
-  users.push({ username, phone, password });
+  const { username, password, phone } = req.body;
+  if (!username || !password || !phone) return res.json({ message: "All fields required" });
+  users.push({ username, password, phone });
   res.json({ message: "Registration successful!" });
 });
 
 // Login
 app.post("/login", (req, res) => {
   const { username, password } = req.body;
-  if (!username || !password) return res.json({ message: "All fields required" });
-
   const user = users.find(u => u.username === username && u.password === password);
   if (user) res.json({ message: "Login successful!" });
   else res.json({ message: "Invalid credentials" });
@@ -62,10 +51,6 @@ app.post("/login", (req, res) => {
 // Deposit
 app.post("/deposit", upload.single("depositProof"), (req, res) => {
   const { bank, cellmoniNumber, amount } = req.body;
-  if (!bank || !cellmoniNumber || !amount) {
-    return res.json({ message: "All fields required" });
-  }
-
   const proof = req.file ? req.file.filename : "";
   transactions.push({ type: "Deposit", bank, cellmoniNumber, amount, proof, date: new Date() });
   res.json({ message: `Deposit submitted! Amount: K${amount}` });
@@ -74,10 +59,6 @@ app.post("/deposit", upload.single("depositProof"), (req, res) => {
 // Withdraw
 app.post("/withdraw", upload.single("withdrawProof"), (req, res) => {
   const { bank, accountNumber, amount } = req.body;
-  if (!bank || !accountNumber || !amount) {
-    return res.json({ message: "All fields required" });
-  }
-
   const proof = req.file ? req.file.filename : "";
   transactions.push({ type: "Withdraw", bank, accountNumber, amount, proof, date: new Date(), withdrawalID: 19070 });
   res.json({ message: `Withdrawal submitted! Amount: K${amount}` });

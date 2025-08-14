@@ -5,17 +5,77 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>History - Jayglo</title>
 <link rel="stylesheet" href="css/style.css">
+<style>
+/* Transaction Table */
+.table-container {
+    max-width: 900px;
+    margin: 20px auto;
+    padding: 15px;
+    background-color: #ffe6e6;
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    overflow-x: auto;
+}
+
+.transaction-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 16px;
+}
+
+.transaction-table th,
+.transaction-table td {
+    padding: 12px 15px;
+    text-align: center;
+    border: 1px solid #ff4d4d;
+}
+
+.transaction-table th {
+    background-color: #ff4d4d;
+    color: white;
+    font-weight: bold;
+}
+
+.transaction-table td {
+    background-color: #fff;
+}
+
+.status-pending {
+    color: #cc0000;
+    font-weight: bold;
+}
+
+.status-approved {
+    color: green;
+    font-weight: bold;
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+    .transaction-table th,
+    .transaction-table td {
+        padding: 8px 10px;
+        font-size: 14px;
+    }
+}
+</style>
 <script>
 async function loadHistory() {
     const res = await fetch('/history');
     const data = await res.json();
-    const table = document.getElementById('history-table');
-    data.forEach(t=>{
-        const row = table.insertRow();
-        row.insertCell(0).innerText = t.type;
-        row.insertCell(1).innerText = t.amount;
-        row.insertCell(2).innerText = t.proof || "-";
-        row.insertCell(3).innerText = new Date(t.date).toLocaleString();
+    const tableBody = document.getElementById('history-body');
+    data.forEach(t => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+            <td>${t.type}</td>
+            <td>${t.amount}</td>
+            <td>${t.proof || "-"}</td>
+            <td>${t.bank || "-"}</td>
+            <td>${t.account || "-"}</td>
+            <td>${new Date(t.date).toLocaleString()}</td>
+            <td class="${t.status.toLowerCase()}">${t.status || "Pending"}</td>
+        `;
+        tableBody.appendChild(row);
     });
 }
 window.onload = loadHistory;
@@ -23,17 +83,28 @@ window.onload = loadHistory;
 </head>
 <body>
 <div class="header"><h1>Transaction History</h1></div>
+
 <marquee class="promo-banner" behavior="scroll">All your transactions are listed below!</marquee>
-<div class="form-container">
-<table id="history-table" border="1" width="100%" style="border-collapse: collapse; text-align: center;">
+
+<div class="table-container">
+<table class="transaction-table">
+<thead>
 <tr>
 <th>Type</th>
 <th>Amount (K)</th>
 <th>Proof</th>
+<th>Bank</th>
+<th>Account</th>
 <th>Date</th>
+<th>Status</th>
 </tr>
+</thead>
+<tbody id="history-body">
+<!-- Transactions loaded here dynamically -->
+</tbody>
 </table>
 </div>
+
 <div class="footer">
 <button onclick="window.location.href='dashboard.html'" class="submit-btn">Back to Dashboard</button>
 </div>

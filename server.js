@@ -28,31 +28,26 @@ let testimonials = [
 ];
 
 // Routes
-app.get("/", (req, res) => res.sendFile(path.join(__dirname, "public", "index.html")));
-app.get("/register", (req, res) => res.sendFile(path.join(__dirname, "public", "register.html")));
-app.get("/login", (req, res) => res.sendFile(path.join(__dirname, "public", "login.html")));
-app.get("/dashboard", (req, res) => res.sendFile(path.join(__dirname, "public", "dashboard.html")));
-app.get("/deposit", (req, res) => res.sendFile(path.join(__dirname, "public", "deposit.html")));
-app.get("/withdraw", (req, res) => res.sendFile(path.join(__dirname, "public", "withdraw.html")));
-app.get("/history", (req, res) => res.sendFile(path.join(__dirname, "public", "history.html")));
-
-// Registration
-app.post("/register", (req, res) => {
-  const { username, phone, password } = req.body;
-  if (!username || !phone || !password) return res.json({ message: "All fields required" });
-  users.push({ username, phone, password });
-  res.json({ message: "Registration successful!", redirect: "/login" });
+app.get("/", (req, res) => {
+  res.sendFile(path.join(__dirname, "public", "index.html"));
 });
 
-// Login
+app.post("/register", (req, res) => {
+  const { phone, password } = req.body;
+  if (!phone || !password) return res.json({ success: false, message: "All fields required" });
+  const exists = users.find(u => u.phone === phone);
+  if (exists) return res.json({ success: false, message: "User already exists" });
+  users.push({ phone, password });
+  res.json({ success: true, message: "Registration successful!" });
+});
+
 app.post("/login", (req, res) => {
   const { phone, password } = req.body;
   const user = users.find(u => u.phone === phone && u.password === password);
-  if (user) res.json({ message: "Login successful!", redirect: "/dashboard" });
-  else res.json({ message: "Invalid credentials" });
+  if (user) res.json({ success: true, message: "Login successful!" });
+  else res.json({ success: false, message: "Invalid credentials" });
 });
 
-// Deposit
 app.post("/deposit", upload.single("depositProof"), (req, res) => {
   const { bank, cellmoniNumber, amount } = req.body;
   const proof = req.file ? req.file.filename : "";
@@ -60,7 +55,6 @@ app.post("/deposit", upload.single("depositProof"), (req, res) => {
   res.json({ message: `Deposit submitted! Amount: K${amount}` });
 });
 
-// Withdraw
 app.post("/withdraw", upload.single("withdrawProof"), (req, res) => {
   const { bank, accountNumber, amount } = req.body;
   const proof = req.file ? req.file.filename : "";
@@ -68,17 +62,18 @@ app.post("/withdraw", upload.single("withdrawProof"), (req, res) => {
   res.json({ message: `Withdrawal submitted! Amount: K${amount}` });
 });
 
-// Transaction history
-app.get("/history-data", (req, res) => res.json(transactions));
+app.get("/history", (req, res) => {
+  res.json(transactions);
+});
 
-// Live user count
-app.get("/live-users", (req, res) => res.json({ count: users.length }));
+app.get("/live-users", (req, res) => {
+  res.json({ count: users.length });
+});
 
-// Live testimonials
-app.get("/testimonials", (req, res) => res.json(testimonials));
+app.get("/testimonials", (req, res) => {
+  res.json(testimonials);
+});
 
-// 404
 app.use((req, res) => res.status(404).send("Page not found"));
 
-// Start server
 app.listen(PORT, () => console.log(`✅ Jayglo CellMoni Agent running on port ${PORT}`));

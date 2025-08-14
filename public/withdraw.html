@@ -26,8 +26,7 @@
 
 <div class="form-container">
     <h2>Withdrawal Request</h2>
-    <form action="/withdraw" method="POST" enctype="multipart/form-data">
-        <!-- Preferred Bank -->
+    <form id="withdrawForm" enctype="multipart/form-data">
         <label for="bank">Select Bank:</label>
         <select id="bank" name="bank" required>
             <option value="">--Choose Bank--</option>
@@ -35,20 +34,18 @@
             <option value="KINA">Kina Bank</option>
         </select>
 
-        <!-- Bank Account -->
         <label for="accountNumber">Your Bank Account Number:</label>
         <input type="text" id="accountNumber" name="accountNumber" placeholder="Enter your bank account number" required>
 
-        <!-- Withdrawal Amount -->
         <label for="amount">Withdrawal Amount (PGK):</label>
         <input type="number" id="amount" name="amount" placeholder="Enter amount in PGK" required>
 
-        <!-- Upload Proof -->
         <label for="withdrawProof">Upload CellMoni Withdrawal Proof:</label>
         <input type="file" id="withdrawProof" name="withdrawProof" accept="image/*" required>
 
         <button type="submit" class="submit-btn">Submit Withdrawal</button>
     </form>
+    <div id="message"></div>
 </div>
 
 <div class="footer">
@@ -58,5 +55,27 @@
 </div>
 
 <script src="js/app.js"></script>
+<script>
+const withdrawForm = document.getElementById("withdrawForm");
+withdrawForm.addEventListener("submit", e => {
+    e.preventDefault();
+    const formData = new FormData(withdrawForm);
+
+    fetch("/withdraw", {
+        method: "POST",
+        body: formData
+    })
+    .then(res => res.json())
+    .then(data => {
+        if(data.success){
+            // Redirect to withdrawal success page
+            window.location.href = "withdraw-success.html";
+        } else {
+            document.getElementById("message").innerText = data.message;
+        }
+    })
+    .catch(()=> document.getElementById("message").innerText = "Error submitting withdrawal.");
+});
+</script>
 </body>
 </html>

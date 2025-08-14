@@ -5,10 +5,23 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Dashboard - Jayglo CellMoni Agent</title>
 <link rel="stylesheet" href="css/style.css">
+<style>
+/* Top-right user info in header */
+.user-info {
+    position: absolute;
+    top: 12px;
+    right: 20px;
+    color: white;
+    font-weight: 500;
+    font-size: 16px;
+    text-align: right;
+}
+</style>
 </head>
 <body>
-<div class="header">
+<div class="header" style="position: relative;">
     <h1>Jayglo CellMoni Agent</h1>
+    <div class="user-info" id="user-info"></div>
 </div>
 
 <marquee class="promo-banner" behavior="scroll" direction="left">
@@ -43,8 +56,24 @@
 
 <script src="js/app.js"></script>
 <script>
-const user = localStorage.getItem("loggedInUser");
-if(!user) window.location.href = "login.html";
+const userPhone = localStorage.getItem("loggedInUser");
+if(!userPhone) window.location.href = "login.html";
+
+// Show user info top-right
+async function loadUserInfo(phone){
+    try{
+        const res = await fetch(`/getUserInfo?phone=${phone}`);
+        const data = await res.json();
+        if(data.success){
+            document.getElementById("user-info").innerText = `${data.fullName} | ${data.phone}`;
+        } else {
+            document.getElementById("user-info").innerText = "User Info Not Found";
+        }
+    }catch(err){
+        document.getElementById("user-info").innerText = "Error Loading Info";
+    }
+}
+loadUserInfo(userPhone);
 
 let usersCount = 120;
 setInterval(() => {

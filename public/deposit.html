@@ -33,9 +33,7 @@
             <option value="KINA">Kina Bank</option>
         </select>
 
-        <div id="bankDetails" class="bank-details">
-            <!-- Bank account will appear here -->
-        </div>
+        <div id="bankDetails" class="bank-details"></div>
 
         <label for="cellmoniNumber">Your 8-digit CellMoni Number:</label>
         <input type="text" id="cellmoniNumber" name="cellmoniNumber" maxlength="8" placeholder="Enter your CellMoni number" required>
@@ -72,7 +70,6 @@ bankSelect.addEventListener("change", () => {
     }
 });
 
-// Handle deposit form submission
 const depositForm = document.getElementById("depositForm");
 depositForm.addEventListener("submit", e => {
     e.preventDefault();
@@ -84,9 +81,12 @@ depositForm.addEventListener("submit", e => {
     })
     .then(res => res.json())
     .then(data => {
-        document.getElementById("message").innerText = data.message;
-        depositForm.reset();
-        bankDetails.innerHTML = "";
+        if(data.success){
+            // Redirect to deposit success page
+            window.location.href = "deposit-success.html";
+        } else {
+            document.getElementById("message").innerText = data.message;
+        }
     })
     .catch(()=> document.getElementById("message").innerText = "Error submitting deposit.");
 });

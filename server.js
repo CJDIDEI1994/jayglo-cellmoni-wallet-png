@@ -10,87 +10,49 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, "public")));
 
-// File upload configuration
+// File upload
 const storage = multer.diskStorage({
   destination: (req, file, cb) => cb(null, "uploads/"),
   filename: (req, file, cb) => cb(null, Date.now() + "-" + file.originalname),
 });
 const upload = multer({ storage });
 
-// In-memory data (demo only)
+// In-memory storage
 let users = [];
 let transactions = [];
-let testimonials = [
-  { name: "Grains", message: "Quick and easy deposit!" },
-  { name: "Salbung", message: "I love using CellMoni via Jayglo Agent!" },
-  { name: "Shermila", message: "Fast withdrawals every time." },
-  { name: "Kaylor", message: "Reliable and trustworthy." }
-];
 
-// Home
-app.get("/", (req, res) => {
-  res.sendFile(path.join(__dirname, "public", "index.html"));
-});
+// Routes
+app.get("/", (req, res) => res.sendFile(path.join(__dirname, "public", "index.html")));
 
-// Registration
 app.post("/register", (req, res) => {
-  const { cellmoniNumber, password } = req.body;
-  if (!cellmoniNumber || !password) {
-    return res.json({ message: "All fields required" });
-  }
-  users.push({ phone: cellmoniNumber, password });
+  const { phone, password } = req.body;
+  if (!phone || !password) return res.json({ message: "All fields required" });
+  if(users.find(u=>u.phone===phone)) return res.json({message:"Phone already registered"});
+  users.push({ phone, password });
   res.json({ message: "Registration successful!" });
 });
 
-// Login
 app.post("/login", (req, res) => {
   const { phone, password } = req.body;
   const user = users.find(u => u.phone === phone && u.password === password);
-  if (user) {
-    res.json({ message: "Login successful!" });
-  } else {
-    res.json({ message: "Invalid credentials" });
-  }
+  if (user) res.json({ message: "Login successful!" });
+  else res.json({ message: "Invalid credentials" });
 });
 
-// Dashboard route
-app.get("/dashboard", (req, res) => {
-  res.sendFile(path.join(__dirname, "public", "dashboard.html"));
-});
-
-// Deposit
-app.post("/deposit", upload.single("depositProof"), (req, res) => {
-  const { bank, cellmoniNumber, amount } = req.body;
+app.post("/deposit", upload.single("proof"), (req, res) => {
+  const { amount } = req.body;
   const proof = req.file ? req.file.filename : "";
-  transactions.push({ type: "Deposit", bank, cellmoniNumber, amount, proof, date: new Date() });
-  res.json({ message: `Deposit submitted! Amount: K${amount}` });
+  transactions.push({ type: "Deposit", amount, proof, date: new Date() });
+  res.json({ message: `Deposit K${amount} submitted!` });
 });
 
-// Withdraw
-app.post("/withdraw", upload.single("withdrawProof"), (req, res) => {
-  const { bank, accountNumber, amount } = req.body;
+app.post("/withdraw", upload.single("proof"), (req, res) => {
+  const { amount } = req.body;
   const proof = req.file ? req.file.filename : "";
-  transactions.push({ type: "Withdraw", bank, accountNumber, amount, proof, date: new Date(), withdrawalID: 19070 });
-  res.json({ message: `Withdrawal submitted! Amount: K${amount}` });
+  transactions.push({ type: "Withdraw", amount, proof, date: new Date() });
+  res.json({ message: `Withdrawal K${amount} submitted!` });
 });
 
-// Transaction history
-app.get("/history", (req, res) => {
-  res.json(transactions);
-});
+app.get("/history", (req, res) => res.json(transactions));
 
-// Live user count
-app.get("/live-users", (req, res) => {
-  res.json({ count: users.length });
-});
-
-// Live testimonials
-app.get("/testimonials", (req, res) => {
-  res.json(testimonials);
-});
-
-// 404
-app.use((req, res) => res.status(404).send("Page not found"));
-
-// Start server
-app.listen(PORT, () => console.log(`✅ Jayglo CellMoni Agent running on port ${PORT}`));
+app.listen(PORT, () => console.log(`✅ Jayglo App running on port ${PORT}`));

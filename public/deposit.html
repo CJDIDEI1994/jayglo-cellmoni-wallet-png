@@ -57,46 +57,52 @@
 
 <script src="js/app.js"></script>
 <script>
-const bankSelect = document.getElementById("bank");
-const bankDetails = document.getElementById("bankDetails");
+document.addEventListener("DOMContentLoaded", () => {
+    const bankSelect = document.getElementById("bank");
+    const bankDetails = document.getElementById("bankDetails");
 
-bankSelect.addEventListener("change", () => {
-    if(bankSelect.value === "BSP") {
-        bankDetails.innerHTML = "<p>BSP Account: <strong>CONRAD JUNIOR DIDEI</strong> ACC: 7015320505</p>";
-    } else if(bankSelect.value === "KINA") {
-        bankDetails.innerHTML = "<p>Kina Bank Account: <strong>CONRAD JUNIOR DIDEI</strong> ACC: 30066515</p>";
-    } else {
-        bankDetails.innerHTML = "";
-    }
-});
-
-const depositForm = document.getElementById("depositForm");
-depositForm.addEventListener("submit", e => {
-    e.preventDefault();
-    const formData = new FormData(depositForm);
-
-    fetch("/deposit", {
-        method: "POST",
-        body: formData
-    })
-    .then(res => res.json())
-    .then(data => {
-        if(data.success){
-            // Redirect to deposit success page
-            window.location.href = "deposit-success.html";
+    // Show bank account number dynamically
+    bankSelect.addEventListener("change", () => {
+        if(bankSelect.value === "BSP") {
+            bankDetails.innerHTML = "<p>BSP Account: <strong>CONRAD JUNIOR DIDEI</strong> ACC: 7015320505</p>";
+        } else if(bankSelect.value === "KINA") {
+            bankDetails.innerHTML = "<p>Kina Bank Account: <strong>CONRAD JUNIOR DIDEI</strong> ACC: 30066515</p>";
         } else {
-            document.getElementById("message").innerText = data.message;
+            bankDetails.innerHTML = "";
         }
-    })
-    .catch(()=> document.getElementById("message").innerText = "Error submitting deposit.");
-});
+    });
 
-// Logout button
-const logoutBtn = document.getElementById("logoutBtn");
-logoutBtn.addEventListener("click", e=>{
-    e.preventDefault();
-    localStorage.removeItem("loggedInUser");
-    window.location.href = "login.html";
+    // Handle deposit form submission
+    const depositForm = document.getElementById("depositForm");
+    depositForm.addEventListener("submit", e => {
+        e.preventDefault();
+        const formData = new FormData(depositForm);
+
+        fetch("/deposit", {
+            method: "POST",
+            body: formData
+        })
+        .then(res => res.json())
+        .then(data => {
+            if(data.success){
+                // Redirect to a general success page
+                window.location.href = "success.html?type=deposit";
+            } else {
+                document.getElementById("message").innerText = data.message;
+            }
+            depositForm.reset();
+            bankDetails.innerHTML = "";
+        })
+        .catch(()=> document.getElementById("message").innerText = "Error submitting deposit.");
+    });
+
+    // Logout button
+    const logoutBtn = document.getElementById("logoutBtn");
+    logoutBtn.addEventListener("click", e=>{
+        e.preventDefault();
+        localStorage.removeItem("loggedInUser");
+        window.location.href = "login.html";
+    });
 });
 </script>
 </body>

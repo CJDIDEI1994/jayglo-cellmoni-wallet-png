@@ -1,4 +1,4 @@
-// Registration
+// ================= Registration =================
 const registerForm = document.getElementById("registerForm");
 if (registerForm) {
     registerForm.addEventListener("submit", e => {
@@ -28,7 +28,7 @@ if (registerForm) {
     });
 }
 
-// Login
+// ================= Login =================
 const loginForm = document.getElementById("loginForm");
 if (loginForm) {
     loginForm.addEventListener("submit", e => {
@@ -53,7 +53,7 @@ if (loginForm) {
     });
 }
 
-// Show message
+// ================= Show message =================
 function showMessage(msg){
     const msgEl = document.getElementById("message");
     if(msgEl) msgEl.innerText = msg;
@@ -66,7 +66,7 @@ if (regMsg) {
     localStorage.removeItem("registerSuccessMessage");
 }
 
-// Deposit form submission
+// ================= Deposit form submission =================
 const depositForm = document.getElementById("depositForm");
 if (depositForm) {
     depositForm.addEventListener("submit", e => {
@@ -86,7 +86,7 @@ if (depositForm) {
     });
 }
 
-// Withdraw form submission
+// ================= Withdraw form submission =================
 const withdrawForm = document.getElementById("withdrawForm");
 if (withdrawForm) {
     withdrawForm.addEventListener("submit", e => {
@@ -106,7 +106,7 @@ if (withdrawForm) {
     });
 }
 
-// Logout button
+// ================= Logout button =================
 const logoutBtn = document.getElementById("logoutBtn");
 if(logoutBtn) {
     logoutBtn.addEventListener("click", e=>{
@@ -114,4 +114,24 @@ if(logoutBtn) {
         localStorage.removeItem("loggedInUser");
         window.location.href = "login.html";
     });
+}
+
+// ================= User Info for Dashboard =================
+const userPhone = localStorage.getItem("loggedInUser");
+if(userPhone){
+    async function loadUserInfo(phone){
+        try{
+            const res = await fetch(`/getUserInfo?phone=${phone}`);
+            const data = await res.json();
+            if(data.success){
+                const userInfoEl = document.getElementById("user-info");
+                if(userInfoEl){
+                    userInfoEl.innerText = `${data.fullName} | ${data.phone}`;
+                }
+            }
+        } catch(err){
+            console.error("Error loading user info:", err);
+        }
+    }
+    loadUserInfo(userPhone);
 }

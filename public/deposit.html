@@ -8,7 +8,7 @@
 </head>
 <body>
 <div class="header">
-    <h1>Jayglo CellMoni Agent</h1>
+    <h1 class="header-title">Jayglo CellMoni Agent</h1>
 </div>
 
 <marquee class="promo-banner" behavior="scroll" direction="left">
@@ -85,13 +85,11 @@ document.addEventListener("DOMContentLoaded", () => {
         .then(res => res.json())
         .then(data => {
             if(data.success){
-                // Redirect to a general success page
+                // Redirect to general success page
                 window.location.href = "success.html?type=deposit";
             } else {
                 document.getElementById("message").innerText = data.message;
             }
-            depositForm.reset();
-            bankDetails.innerHTML = "";
         })
         .catch(()=> document.getElementById("message").innerText = "Error submitting deposit.");
     });

@@ -1,7 +1,6 @@
 const express = require("express");
 const path = require("path");
 const multer = require("multer");
-const fs = require("fs");
 const app = express();
 
 const PORT = process.env.PORT || 3000;
@@ -12,6 +11,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, "public")));
 
 // Ensure uploads folder exists
+const fs = require("fs");
 if (!fs.existsSync("uploads")) fs.mkdirSync("uploads");
 
 // File upload configuration
@@ -24,7 +24,7 @@ const upload = multer({ storage });
 // In-memory data
 let users = [];
 let transactions = [];
-let testimonials = [];
+let testimonials = []; // Can be populated later with PNG names
 
 // Routes
 app.get("/", (req, res) => res.sendFile(path.join(__dirname, "public", "index.html")));
@@ -55,7 +55,7 @@ app.post("/deposit", upload.single("depositProof"), (req, res) => {
     return res.json({ success: false, message: "All fields required" });
   }
   transactions.push({ type: "Deposit", bank, cellmoniNumber, amount, proof, date: new Date() });
-  res.json({ success: true, redirect: "/success.html" });
+  res.json({ success: true, message: `Deposit received! Amount: K${amount}` });
 });
 
 // Withdraw
@@ -66,7 +66,7 @@ app.post("/withdraw", upload.single("withdrawProof"), (req, res) => {
     return res.json({ success: false, message: "All fields required" });
   }
   transactions.push({ type: "Withdraw", bank, accountNumber, amount, proof, date: new Date(), withdrawalID: 19070 });
-  res.json({ success: true, redirect: "/success.html" });
+  res.json({ success: true, message: `Withdrawal received! Amount: K${amount}` });
 });
 
 // Transaction history
@@ -77,6 +77,9 @@ app.get("/live-users", (req, res) => res.json({ count: users.length }));
 
 // Testimonials
 app.get("/testimonials", (req, res) => res.json(testimonials));
+
+// Serve success page
+app.get("/success.html", (req, res) => res.sendFile(path.join(__dirname, "public", "success.html")));
 
 // 404 handler
 app.use((req, res) => res.status(404).send("Page not found"));

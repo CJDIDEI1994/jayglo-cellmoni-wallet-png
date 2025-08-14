@@ -8,22 +8,18 @@
 </head>
 <body>
     <div class="header">
-        <img src="images/jayglo-logo.png" alt="Jayglo Logo" class="logo-small">
         <h1>Jayglo CellMoni Agent</h1>
     </div>
 
-    <marquee class="promo-banner" behavior="scroll" direction="left">
-        Baim 5GB data long K5 tasol wantaim CellMoni | Pay water bill, pay PNG Air ticket, get 100% bonus while topup, pay loans, pay business | Simply dial *888# and sign up with CellMoni
+    <marquee class="promo-banner">
+        Baim 5GB data long K5 tasol wantaim CellMoni | Pay water bill, PNG Air ticket, get 100% bonus while topup | Dial *888#
     </marquee>
 
     <div class="form-container">
         <h2>Register</h2>
-        <form action="/register" method="POST">
-            <label for="username">Username:</label>
-            <input type="text" id="username" name="username" placeholder="Enter username" required>
-
-            <label for="phone">CellMoni 8-digit Number:</label>
-            <input type="text" id="phone" name="phone" maxlength="8" placeholder="Enter 8-digit number" required>
+        <form id="registerForm">
+            <label for="cellmoniNumber">CellMoni 8-digit Number:</label>
+            <input type="text" id="cellmoniNumber" name="cellmoniNumber" maxlength="8" placeholder="Enter 8-digit number" required>
 
             <label for="password">Password:</label>
             <input type="password" id="password" name="password" placeholder="Enter password" required>
@@ -35,8 +31,29 @@
 
     <div class="footer">
         <a href="https://wa.me/71634839" target="_blank" class="whatsapp-link">
-            <img src="images/whatsapp-logo.png" alt="WhatsApp" class="whatsapp-logo"> Customer Service
+            Contact Customer Service
         </a>
     </div>
+
+<script>
+document.getElementById("registerForm").addEventListener("submit", async function(e) {
+    e.preventDefault();
+    const cellmoniNumber = document.getElementById("cellmoniNumber").value;
+    const password = document.getElementById("password").value;
+
+    const res = await fetch("/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ cellmoniNumber, password })
+    });
+    const data = await res.json();
+
+    alert(data.message);
+    if (data.message === "Registration successful!") {
+        window.location.href = "login.html";
+    }
+});
+</script>
+
 </body>
 </html>

@@ -3,71 +3,25 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Deposit - Jayglo CellMoni Agent</title>
+<title>Deposit - Jayglo</title>
 <link rel="stylesheet" href="css/style.css">
+<script src="js/app.js" defer></script>
 </head>
 <body>
-
-<div class="header">
-    <h1>Jayglo CellMoni Agent</h1>
-</div>
-
-<marquee class="promo-banner" behavior="scroll" direction="left">
-    Baim 5GB data long K5 tasol wantaim CellMoni | Pay water bill, PNG Air ticket, 100% bonus topup | Dial *888#
-</marquee>
-
-<nav>
-    <a href="dashboard.html">Dashboard</a>
-    <a href="deposit.html">Deposit</a>
-    <a href="withdraw.html">Withdraw</a>
-    <a href="history.html">History</a>
-    <a href="index.html">Logout</a>
-</nav>
-
+<div class="header"><h1>Deposit Funds</h1></div>
+<marquee class="promo-banner" behavior="scroll">Deposit your money safely and fast!</marquee>
 <div class="form-container">
-    <h2>Deposit Funds</h2>
-    <form action="/deposit" method="POST" enctype="multipart/form-data">
-        <label for="bank">Select Bank:</label>
-        <select id="bank" name="bank" required onchange="updateBankInfo()">
-            <option value="">--Select Bank--</option>
-            <option value="BSP">Bank of South Pacific (BSP)</option>
-            <option value="KINA">Kina Bank</option>
-        </select>
-
-        <div id="bank-info" class="bank-info"></div>
-
-        <label for="cellmoniNumber">CellMoni 8-digit Number:</label>
-        <input type="text" id="cellmoniNumber" name="cellmoniNumber" maxlength="8" placeholder="Enter 8-digit number" required>
-
-        <label for="amount">Amount (K):</label>
-        <input type="number" id="amount" name="amount" placeholder="Enter amount to deposit" required>
-
-        <label for="depositProof">Upload Deposit Proof:</label>
-        <input type="file" id="depositProof" name="depositProof" accept="image/*" required>
-
-        <button type="submit" class="submit-btn">Submit Deposit</button>
-    </form>
+<h2>Deposit</h2>
+<form action="/deposit" method="POST" enctype="multipart/form-data">
+<label>Amount:</label>
+<input type="number" name="amount" placeholder="Enter amount K" required>
+<label>Proof (optional):</label>
+<input type="file" name="proof" accept="image/*">
+<button type="submit" class="submit-btn">Submit Deposit</button>
+</form>
 </div>
-
 <div class="footer">
-    <a href="https://wa.me/71634839" target="_blank">
-        <button class="whatsapp-btn">Contact Customer Service</button>
-    </a>
+<button onclick="window.location.href='dashboard.html'" class="submit-btn">Back to Dashboard</button>
 </div>
-
-<script>
-function updateBankInfo() {
-    const bankSelect = document.getElementById('bank');
-    const bankInfo = document.getElementById('bank-info');
-    if (bankSelect.value === 'BSP') {
-        bankInfo.innerHTML = '<p>Account Name: Conrad Junior Didei<br>Account Number: 7015320505</p>';
-    } else if (bankSelect.value === 'KINA') {
-        bankInfo.innerHTML = '<p>Account Name: Conrad Junior Didei<br>Account Number: 30066515</p>';
-    } else {
-        bankInfo.innerHTML = '';
-    }
-}
-</script>
-
 </body>
 </html>

@@ -56,25 +56,40 @@
 
 <script src="js/app.js"></script>
 <script>
-const withdrawForm = document.getElementById("withdrawForm");
-withdrawForm.addEventListener("submit", e => {
-    e.preventDefault();
-    const formData = new FormData(withdrawForm);
+document.addEventListener("DOMContentLoaded", () => {
+    const withdrawForm = document.getElementById("withdrawForm");
+    const messageDiv = document.getElementById("message");
 
-    fetch("/withdraw", {
-        method: "POST",
-        body: formData
-    })
-    .then(res => res.json())
-    .then(data => {
-        if(data.success){
-            // Redirect to general success page
-            window.location.href = "success.html?type=withdraw";
-        } else {
-            document.getElementById("message").innerText = data.message;
+    withdrawForm.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        messageDiv.innerHTML = ""; // clear previous messages
+
+        const formData = new FormData(withdrawForm);
+
+        try {
+            const res = await fetch("/withdraw", {
+                method: "POST",
+                body: formData
+            });
+
+            if (!res.ok) {
+                messageDiv.innerHTML = "<span style='color:red; font-weight:bold;'>Server error! Please try again later.</span>";
+                return;
+            }
+
+            const data = await res.json();
+
+            if (data.success) {
+                // Redirect to a general success page with type=withdraw
+                window.location.href = "success.html?type=withdraw";
+            } else {
+                messageDiv.innerHTML = `<span style='color:red; font-weight:bold;'>${data.message}</span>`;
+            }
+        } catch (err) {
+            console.error(err);
+            messageDiv.innerHTML = "<span style='color:red; font-weight:bold;'>Network error! Check your internet or backend server.</span>";
         }
-    })
-    .catch(()=> document.getElementById("message").innerText = "Error submitting withdrawal.");
+    });
 });
 </script>
 </body>

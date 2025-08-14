@@ -3,68 +3,101 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Dashboard - Jayglo CellMoni Agent</title>
+<title>Deposit - Jayglo CellMoni Agent</title>
 <link rel="stylesheet" href="css/style.css">
-<style>
-body { font-family: Arial, sans-serif; background: linear-gradient(120deg, #f6d365, #fda085); color: #333; }
-.header { text-align: center; padding: 20px; animation: fadeInDown 1s; }
-.navbar { display: flex; justify-content: center; gap: 20px; margin: 20px 0; animation: fadeIn 1.5s; }
-.navbar button { padding: 10px 15px; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; transition: 0.3s; }
-.navbar button:hover { opacity: 0.8; }
-.dashboard-container { max-width: 800px; margin: auto; padding: 20px; background: rgba(255,255,255,0.9); border-radius: 10px; box-shadow: 0 0 15px rgba(0,0,0,0.2); animation: fadeInUp 1s; }
-.card { background: #ffb347; padding: 20px; margin: 10px 0; border-radius: 10px; text-align: center; color: white; font-weight: bold; animation: fadeIn 1s; }
-.card h2 { margin: 0; }
-.footer { text-align: center; margin-top: 20px; }
-@keyframes fadeInDown { from {opacity:0; transform: translateY(-50px);} to {opacity:1; transform:translateY(0);} }
-@keyframes fadeInUp { from {opacity:0; transform: translateY(50px);} to {opacity:1; transform:translateY(0);} }
-@keyframes fadeIn { from {opacity:0;} to {opacity:1;} }
-</style>
 </head>
 <body>
-
 <div class="header">
-    <h1>Jayglo CellMoni Agent Dashboard</h1>
+    <h1>Jayglo CellMoni Agent</h1>
 </div>
 
-<div class="navbar">
-    <button onclick="location.href='deposit.html'">Deposit</button>
-    <button onclick="location.href='withdraw.html'">Withdraw</button>
-    <button onclick="location.href='history.html'">Transaction History</button>
-    <button onclick="logout()">Logout</button>
-</div>
+<marquee class="promo-banner" behavior="scroll" direction="left">
+    Deposit via BSP or Kina Bank and receive CellMoni instantly! | Trusted by hundreds of users every day!
+</marquee>
 
-<div class="dashboard-container">
-    <div class="card">
-        <h2>Welcome, <span id="usernameDisplay">User</span></h2>
-    </div>
-    <div class="card">
-        <h2>Live Users: <span id="liveUsers">0</span></h2>
-    </div>
+<nav>
+    <a href="dashboard.html">Dashboard</a>
+    <a href="deposit.html" class="active">Deposit</a>
+    <a href="withdraw.html">Withdraw</a>
+    <a href="history.html">History</a>
+    <a href="#" id="logoutBtn">Logout</a>
+</nav>
+
+<div class="form-container">
+    <h2>Deposit Funds</h2>
+    <form id="depositForm" enctype="multipart/form-data">
+        <label for="bank">Select Bank:</label>
+        <select id="bank" name="bank" required>
+            <option value="">-- Select Bank --</option>
+            <option value="BSP">Bank of South Pacific (BSP)</option>
+            <option value="KINA">Kina Bank</option>
+        </select>
+
+        <div id="bankDetails" class="bank-details">
+            <!-- Bank account will appear here -->
+        </div>
+
+        <label for="cellmoniNumber">Your 8-digit CellMoni Number:</label>
+        <input type="text" id="cellmoniNumber" name="cellmoniNumber" maxlength="8" placeholder="Enter your CellMoni number" required>
+
+        <label for="amount">Amount (PGK):</label>
+        <input type="number" id="amount" name="amount" placeholder="Enter amount in PGK" required>
+
+        <label for="depositProof">Upload Payment Proof:</label>
+        <input type="file" id="depositProof" name="depositProof" accept="image/*" required>
+
+        <button type="submit" class="submit-btn">Submit Deposit</button>
+    </form>
+    <div id="message"></div>
 </div>
 
 <div class="footer">
-    <p>Jayglo CellMoni Agent &copy; 2025</p>
+    <a href="https://wa.me/71634839" target="_blank">
+        <button class="whatsapp-btn">Contact Customer Service</button>
+    </a>
 </div>
 
+<script src="js/app.js"></script>
 <script>
-// Sample user data (replace with real session logic)
-let currentUser = { username: "Guest" };
-document.getElementById("usernameDisplay").innerText = currentUser.username;
+const bankSelect = document.getElementById("bank");
+const bankDetails = document.getElementById("bankDetails");
 
-// Fetch live user count
-async function fetchLiveUsers() {
-    const res = await fetch("/live-users");
-    const data = await res.json();
-    document.getElementById("liveUsers").innerText = data.count;
-}
-fetchLiveUsers();
-setInterval(fetchLiveUsers, 5000); // update every 5 sec
+bankSelect.addEventListener("change", () => {
+    if(bankSelect.value === "BSP") {
+        bankDetails.innerHTML = "<p>BSP Account: <strong>CONRAD JUNIOR DIDEI</strong> ACC: 7015320505</p>";
+    } else if(bankSelect.value === "KINA") {
+        bankDetails.innerHTML = "<p>Kina Bank Account: <strong>CONRAD JUNIOR DIDEI</strong> ACC: 30066515</p>";
+    } else {
+        bankDetails.innerHTML = "";
+    }
+});
 
-function logout() {
-    alert("Logged out successfully!");
+// Handle deposit form submission
+const depositForm = document.getElementById("depositForm");
+depositForm.addEventListener("submit", e => {
+    e.preventDefault();
+    const formData = new FormData(depositForm);
+
+    fetch("/deposit", {
+        method: "POST",
+        body: formData
+    })
+    .then(res => res.json())
+    .then(data => {
+        document.getElementById("message").innerText = data.message;
+        depositForm.reset();
+        bankDetails.innerHTML = "";
+    })
+    .catch(()=> document.getElementById("message").innerText = "Error submitting deposit.");
+});
+
+// Logout button
+const logoutBtn = document.getElementById("logoutBtn");
+logoutBtn.addEventListener("click", e=>{
+    e.preventDefault();
+    localStorage.removeItem("loggedInUser");
     window.location.href = "login.html";
-}
+});
 </script>
-
 </body>
 </html>

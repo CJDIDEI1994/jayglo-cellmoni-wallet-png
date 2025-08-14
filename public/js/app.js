@@ -20,7 +20,6 @@ if (registerForm) {
         .then(data => {
             showMessage(data.message);
             if(data.success){
-                // Store success message for login page
                 localStorage.setItem("registerSuccessMessage", data.message);
                 setTimeout(()=> window.location.href="login.html", 1000);
             }
@@ -51,6 +50,43 @@ if (loginForm) {
             }
         })
         .catch(()=> showMessage("Error during login."));
+    });
+}
+
+// Deposit & Withdraw forms
+const depositForm = document.getElementById("depositForm");
+if (depositForm) {
+    depositForm.addEventListener("submit", e => {
+        e.preventDefault();
+        const formData = new FormData(depositForm);
+        fetch("/deposit", { method: "POST", body: formData })
+        .then(res => res.json())
+        .then(data => {
+            if(data.success && data.redirect){
+                window.location.href = data.redirect;
+            } else {
+                showMessage(data.message);
+            }
+        })
+        .catch(()=> showMessage("Error submitting deposit."));
+    });
+}
+
+const withdrawForm = document.getElementById("withdrawForm");
+if (withdrawForm) {
+    withdrawForm.addEventListener("submit", e => {
+        e.preventDefault();
+        const formData = new FormData(withdrawForm);
+        fetch("/withdraw", { method: "POST", body: formData })
+        .then(res => res.json())
+        .then(data => {
+            if(data.success && data.redirect){
+                window.location.href = data.redirect;
+            } else {
+                showMessage(data.message);
+            }
+        })
+        .catch(()=> showMessage("Error submitting withdrawal."));
     });
 }
 

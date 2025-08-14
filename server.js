@@ -1,6 +1,7 @@
 const express = require("express");
 const path = require("path");
 const multer = require("multer");
+const fs = require("fs");
 const app = express();
 
 const PORT = process.env.PORT || 3000;
@@ -11,7 +12,6 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, "public")));
 
 // Ensure uploads folder exists
-const fs = require("fs");
 if (!fs.existsSync("uploads")) fs.mkdirSync("uploads");
 
 // File upload configuration
@@ -24,7 +24,7 @@ const upload = multer({ storage });
 // In-memory data
 let users = [];
 let transactions = [];
-let testimonials = []; // You can fill later with PNG names
+let testimonials = [];
 
 // Routes
 app.get("/", (req, res) => res.sendFile(path.join(__dirname, "public", "index.html")));
@@ -55,7 +55,7 @@ app.post("/deposit", upload.single("depositProof"), (req, res) => {
     return res.json({ success: false, message: "All fields required" });
   }
   transactions.push({ type: "Deposit", bank, cellmoniNumber, amount, proof, date: new Date() });
-  res.json({ success: true, message: `Deposit submitted! Amount: K${amount}` });
+  res.json({ success: true, redirect: "/success.html" });
 });
 
 // Withdraw
@@ -66,7 +66,7 @@ app.post("/withdraw", upload.single("withdrawProof"), (req, res) => {
     return res.json({ success: false, message: "All fields required" });
   }
   transactions.push({ type: "Withdraw", bank, accountNumber, amount, proof, date: new Date(), withdrawalID: 19070 });
-  res.json({ success: true, message: `Withdrawal submitted! Amount: K${amount}` });
+  res.json({ success: true, redirect: "/success.html" });
 });
 
 // Transaction history

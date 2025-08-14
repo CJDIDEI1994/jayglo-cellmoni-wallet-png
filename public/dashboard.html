@@ -5,42 +5,64 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Dashboard - Jayglo CellMoni Agent</title>
 <link rel="stylesheet" href="css/style.css">
+<script>
+async function loadLiveUsers() {
+    const res = await fetch('/live-users');
+    const data = await res.json();
+    document.getElementById('live-users').innerText = data.count;
+}
+
+async function loadTestimonials() {
+    const res = await fetch('/testimonials');
+    const data = await res.json();
+    const container = document.getElementById('testimonials');
+    data.forEach(t=>{
+        const div = document.createElement('div');
+        div.className = 'testimonial';
+        div.innerText = `"${t.message}" - ${t.name}`;
+        container.appendChild(div);
+    });
+}
+
+window.onload = () => {
+    loadLiveUsers();
+    loadTestimonials();
+}
+</script>
 <style>
-.dashboard {
-    text-align: center;
-    padding: 30px;
-    animation: fadeIn 1s ease-in-out;
-}
-@keyframes fadeIn {
-    from { opacity: 0; transform: translateY(20px); }
-    to { opacity: 1; transform: translateY(0); }
-}
-.dashboard a {
-    display: inline-block;
-    margin: 10px;
-    padding: 10px 20px;
-    background: #28a745;
-    color: white;
-    text-decoration: none;
-    border-radius: 8px;
-}
-.dashboard a:hover {
-    background: #218838;
-}
+body { font-family: Arial, sans-serif; background-color: #fff0f5; color: #660033; }
+.header { text-align: center; padding: 15px; }
+.promo-banner { background-color: #ffccff; padding: 5px; font-weight: bold; color: #660033; }
+.dashboard-buttons { display: flex; justify-content: space-around; flex-wrap: wrap; margin: 20px 0; }
+.dashboard-buttons button { padding: 15px 25px; margin: 10px; background-color: #ff66b3; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; transition: 0.3s; }
+.dashboard-buttons button:hover { background-color: #cc3399; transform: scale(1.05); }
+.footer { text-align: center; margin-top: 20px; }
+.testimonial { background-color: #ffe6f2; margin: 5px; padding: 10px; border-radius: 5px; }
 </style>
 </head>
 <body>
 
-<div class="header">
-    <h1>Welcome to Your Dashboard</h1>
+<div class="header"><h1>Welcome to Jayglo CellMoni Agent Dashboard</h1></div>
+
+<marquee class="promo-banner" behavior="scroll" direction="left">
+Top services at your fingertips! Deposit, Withdraw, Check History, and More!
+</marquee>
+
+<div class="dashboard-buttons">
+<button onclick="window.location.href='deposit.html'">Deposit</button>
+<button onclick="window.location.href='withdraw.html'">Withdraw</button>
+<button onclick="window.location.href='history.html'">Transaction History</button>
 </div>
 
-<div class="dashboard">
-    <p>Manage your CellMoni transactions easily.</p>
-    <a href="deposit.html">Deposit</a>
-    <a href="withdraw.html">Withdraw</a>
-    <a href="history.html">Transaction History</a>
-    <a href="index.html">Logout</a>
+<div style="text-align:center; margin-top:10px;">
+Live Users Online: <span id="live-users">0</span>
+</div>
+
+<h2 style="text-align:center; margin-top:20px;">Testimonials</h2>
+<div id="testimonials" style="max-width: 600px; margin:auto;"></div>
+
+<div class="footer">
+<button onclick="window.location.href='login.html'" class="submit-btn">Logout</button>
 </div>
 
 </body>

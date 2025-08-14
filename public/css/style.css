@@ -154,10 +154,28 @@ nav a.active {
     color: #cc0000;
 }
 
+/* Success / Message Notification */
+#message {
+    background-color: #cc0000; /* thick red sticker */
+    color: #fff;
+    padding: 12px 15px;
+    margin-top: 15px;
+    text-align: center;
+    font-size: 16px; /* standard readable size */
+    font-weight: bold;
+    border-radius: 8px;
+    animation: fadeInMessage 0.6s ease; /* smooth fade-in */
+}
+
 /* Animations */
 @keyframes fadeInDown {
     from { opacity: 0; transform: translateY(-20px); }
     to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeInMessage {
+    0% { opacity: 0; transform: translateY(-10px); }
+    100% { opacity: 1; transform: translateY(0); }
 }
 
 /* Responsive */

@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Transaction Received - Jayglo CellMoni Agent</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<div class="header">
+    <h1>Jayglo CellMoni Agent</h1>
+</div>
+
+<div class="form-container">
+    <h2>Transaction Received!</h2>
+    <p id="successMessage">
+        Thank you for your transaction. Your deposit or withdrawal has been received and is being processed.  
+        Trusted by Papua New Guineans.
+    </p>
+    <a href="dashboard.html"><button class="submit-btn">Go to Dashboard</button></a>
+</div>
+
+<div class="footer">
+    <a href="https://wa.me/71634839" target="_blank">
+        <button class="whatsapp-btn">Contact Customer Service</button>
+    </a>
+</div>
+
+<script>
+const urlParams = new URLSearchParams(window.location.search);
+const type = urlParams.get('type');
+const msgEl = document.getElementById("successMessage");
+
+if(type === "deposit"){
+    msgEl.innerHTML = "Your deposit has been received and is being processed. Thank you for choosing Jayglo CellMoni Agent. Trusted by Papua New Guineans.";
+} else if(type === "withdraw"){
+    msgEl.innerHTML = "Your withdrawal has been received and is being processed. Thank you for choosing Jayglo CellMoni Agent. Trusted by Papua New Guineans.";
+}
+</script>
+
+</body>
+</html>

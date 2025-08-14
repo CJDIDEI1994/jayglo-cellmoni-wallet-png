@@ -9,7 +9,7 @@
 <body>
 
 <div class="header">
-    <h1>19070 JAYGLO CELLMONI AGENT</h1>
+    <h1 class="header-title">19070 Jayglo CellMoni Agent</h1>
 </div>
 
 <marquee class="promo-banner" behavior="scroll" direction="left">
@@ -68,8 +68,8 @@ withdrawForm.addEventListener("submit", e => {
     .then(res => res.json())
     .then(data => {
         if(data.success){
-            // Redirect to withdrawal success page
-            window.location.href = "withdraw-success.html";
+            // Redirect to general success page
+            window.location.href = "success.html?type=withdraw";
         } else {
             document.getElementById("message").innerText = data.message;
         }

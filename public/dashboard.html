@@ -5,23 +5,11 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Dashboard - Jayglo CellMoni Agent</title>
 <link rel="stylesheet" href="css/style.css">
-<style>
-/* Top-right user info in header */
-.user-info {
-    position: absolute;
-    top: 12px;
-    right: 20px;
-    color: white;
-    font-weight: 500;
-    font-size: 16px;
-    text-align: right;
-}
-</style>
 </head>
 <body>
-<div class="header" style="position: relative;">
+<div class="header" style="display: flex; justify-content: space-between; align-items: center; padding: 12px 20px;">
     <h1>Jayglo CellMoni Agent</h1>
-    <div class="user-info" id="user-info"></div>
+    <div id="user-info" style="font-size: 16px; font-weight: 500; color: white;"></div>
 </div>
 
 <marquee class="promo-banner" behavior="scroll" direction="left">
@@ -56,31 +44,29 @@
 
 <script src="js/app.js"></script>
 <script>
-const userPhone = localStorage.getItem("loggedInUser");
-if(!userPhone) window.location.href = "login.html";
+const user = localStorage.getItem("loggedInUser");
+if(!user) window.location.href = "login.html";
 
-// Show user info top-right
-async function loadUserInfo(phone){
-    try{
-        const res = await fetch(`/getUserInfo?phone=${phone}`);
-        const data = await res.json();
+// Display user full name and CellMoni phone number
+const userInfoDiv = document.getElementById("user-info");
+fetch("/getUser?phone=" + user)
+    .then(res => res.json())
+    .then(data => {
         if(data.success){
-            document.getElementById("user-info").innerText = `${data.fullName} | ${data.phone}`;
+            userInfoDiv.textContent = `${data.fullName} | ${data.phone}`;
         } else {
-            document.getElementById("user-info").innerText = "User Info Not Found";
+            userInfoDiv.textContent = user;
         }
-    }catch(err){
-        document.getElementById("user-info").innerText = "Error Loading Info";
-    }
-}
-loadUserInfo(userPhone);
+    });
 
+// Active users counter
 let usersCount = 120;
 setInterval(() => {
     usersCount += Math.floor(Math.random() * 3) - 1;
     document.getElementById("activeUsers").textContent = usersCount;
 }, 2000);
 
+// Testimonials
 fetch("/testimonials")
     .then(res => res.json())
     .then(data => {
@@ -88,6 +74,7 @@ fetch("/testimonials")
         marquee.textContent = data.map(t => `${t.name}: ${t.message}`).join(" | ");
     });
 
+// Logout button
 document.getElementById("logoutBtn").addEventListener("click", e=>{
     e.preventDefault();
     localStorage.removeItem("loggedInUser");

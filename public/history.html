@@ -3,55 +3,39 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Transaction History - Jayglo CellMoni Agent</title>
+<title>History - Jayglo</title>
 <link rel="stylesheet" href="css/style.css">
+<script>
+async function loadHistory() {
+    const res = await fetch('/history');
+    const data = await res.json();
+    const table = document.getElementById('history-table');
+    data.forEach(t=>{
+        const row = table.insertRow();
+        row.insertCell(0).innerText = t.type;
+        row.insertCell(1).innerText = t.amount;
+        row.insertCell(2).innerText = t.proof || "-";
+        row.insertCell(3).innerText = new Date(t.date).toLocaleString();
+    });
+}
+window.onload = loadHistory;
+</script>
 </head>
 <body>
-
-<div class="header">
-    <h1>Jayglo CellMoni Agent</h1>
-</div>
-
-<marquee class="promo-banner" behavior="scroll" direction="left">
-    Baim 5GB data long K5 tasol wantaim CellMoni | Pay water bill, PNG Air ticket, 100% bonus topup | Dial *888#
-</marquee>
-
-<nav>
-    <a href="dashboard.html">Dashboard</a>
-    <a href="deposit.html">Deposit</a>
-    <a href="withdraw.html">Withdraw</a>
-    <a href="history.html">History</a>
-    <a href="index.html">Logout</a>
-</nav>
-
+<div class="header"><h1>Transaction History</h1></div>
+<marquee class="promo-banner" behavior="scroll">All your transactions are listed below!</marquee>
 <div class="form-container">
-    <h2>Transaction History</h2>
-    <div id="history">
-        <p>No transactions yet.</p>
-    </div>
+<table id="history-table" border="1" width="100%" style="border-collapse: collapse; text-align: center;">
+<tr>
+<th>Type</th>
+<th>Amount (K)</th>
+<th>Proof</th>
+<th>Date</th>
+</tr>
+</table>
 </div>
-
 <div class="footer">
-    <a href="https://wa.me/71634839" target="_blank">
-        <button class="whatsapp-btn">Contact Customer Service</button>
-    </a>
+<button onclick="window.location.href='dashboard.html'" class="submit-btn">Back to Dashboard</button>
 </div>
-
-<script>
-    // Example: Display sample transactions dynamically
-    const historyDiv = document.getElementById('history');
-    const sampleTransactions = [
-        { type: 'Deposit', amount: 50, date: '2025-08-13' },
-        { type: 'Withdraw', amount: 30, date: '2025-08-12' },
-        { type: 'Deposit', amount: 100, date: '2025-08-11' }
-    ];
-
-    sampleTransactions.forEach(tx => {
-        const p = document.createElement('p');
-        p.textContent = `${tx.date} - ${tx.type}: K${tx.amount}`;
-        historyDiv.appendChild(p);
-    });
-</script>
-
 </body>
 </html>

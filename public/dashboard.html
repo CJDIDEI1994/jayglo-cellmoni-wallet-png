@@ -5,65 +5,65 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Dashboard - Jayglo CellMoni Agent</title>
 <link rel="stylesheet" href="css/style.css">
-<script>
-async function loadLiveUsers() {
-    const res = await fetch('/live-users');
-    const data = await res.json();
-    document.getElementById('live-users').innerText = data.count;
-}
-
-async function loadTestimonials() {
-    const res = await fetch('/testimonials');
-    const data = await res.json();
-    const container = document.getElementById('testimonials');
-    data.forEach(t=>{
-        const div = document.createElement('div');
-        div.className = 'testimonial';
-        div.innerText = `"${t.message}" - ${t.name}`;
-        container.appendChild(div);
-    });
-}
-
-window.onload = () => {
-    loadLiveUsers();
-    loadTestimonials();
-}
-</script>
-<style>
-body { font-family: Arial, sans-serif; background-color: #fff0f5; color: #660033; }
-.header { text-align: center; padding: 15px; }
-.promo-banner { background-color: #ffccff; padding: 5px; font-weight: bold; color: #660033; }
-.dashboard-buttons { display: flex; justify-content: space-around; flex-wrap: wrap; margin: 20px 0; }
-.dashboard-buttons button { padding: 15px 25px; margin: 10px; background-color: #ff66b3; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; transition: 0.3s; }
-.dashboard-buttons button:hover { background-color: #cc3399; transform: scale(1.05); }
-.footer { text-align: center; margin-top: 20px; }
-.testimonial { background-color: #ffe6f2; margin: 5px; padding: 10px; border-radius: 5px; }
-</style>
 </head>
 <body>
-
-<div class="header"><h1>Welcome to Jayglo CellMoni Agent Dashboard</h1></div>
+<div class="header">
+    <h1>Jayglo CellMoni Agent</h1>
+</div>
 
 <marquee class="promo-banner" behavior="scroll" direction="left">
-Top services at your fingertips! Deposit, Withdraw, Check History, and More!
+    Baim 5GB data long K5 tasol wantaim CellMoni | Pay water bill, PNG Air ticket, 100% bonus topup | Dial *888#
 </marquee>
 
-<div class="dashboard-buttons">
-<button onclick="window.location.href='deposit.html'">Deposit</button>
-<button onclick="window.location.href='withdraw.html'">Withdraw</button>
-<button onclick="window.location.href='history.html'">Transaction History</button>
-</div>
+<nav>
+    <a href="dashboard.html">Dashboard</a>
+    <a href="deposit.html">Deposit</a>
+    <a href="withdraw.html">Withdraw</a>
+    <a href="history.html">History</a>
+    <a href="#" id="logoutBtn">Logout</a>
+</nav>
 
-<div style="text-align:center; margin-top:10px;">
-Live Users Online: <span id="live-users">0</span>
+<div class="form-container">
+    <h2>Welcome to Your Dashboard</h2>
+    <div class="live-stats">
+        Active Users: <span id="activeUsers">0</span>
+    </div>
+    <div class="testimonials">
+        <marquee behavior="scroll" direction="left" scrollamount="4" id="testimonials">
+            Welcome to Jayglo! Fast deposits & withdrawals across PNG! | Trusted by hundreds of users every day!
+        </marquee>
+    </div>
 </div>
-
-<h2 style="text-align:center; margin-top:20px;">Testimonials</h2>
-<div id="testimonials" style="max-width: 600px; margin:auto;"></div>
 
 <div class="footer">
-<button onclick="window.location.href='login.html'" class="submit-btn">Logout</button>
+    <a href="https://wa.me/71634839" target="_blank">
+        <button class="whatsapp-btn">Contact Customer Service</button>
+    </a>
 </div>
 
+<script src="js/app.js"></script>
+<script>
+const user = localStorage.getItem("loggedInUser");
+if(!user) window.location.href = "login.html";
+
+let usersCount = 120;
+setInterval(() => {
+    usersCount += Math.floor(Math.random() * 3) - 1;
+    document.getElementById("activeUsers").textContent = usersCount;
+}, 2000);
+
+fetch("/testimonials")
+    .then(res => res.json())
+    .then(data => {
+        const marquee = document.getElementById("testimonials");
+        marquee.textContent = data.map(t => `${t.name}: ${t.message}`).join(" | ");
+    });
+
+document.getElementById("logoutBtn").addEventListener("click", e=>{
+    e.preventDefault();
+    localStorage.removeItem("loggedInUser");
+    window.location.href = "login.html";
+});
+</script>
 </body>
 </html>

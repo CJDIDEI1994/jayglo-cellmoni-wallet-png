@@ -1,44 +1,22 @@
-# Jayglo CellMoni Agent 💳📱
+# Jayglo CellMoni Wallet - 2025 Version
 
-A simple, fast, and friendly web platform for **CellMoni deposits, withdrawals, and payments** in PNG.  
-Built with **Node.js + Express** and a clean HTML/CSS frontend.
-
----
-
-## 🚀 Features
-- **User Registration & Login** with form validation
-- **Deposit & Withdrawal Requests** with file upload for proof
-- **Live Testimonials** display
-- **Responsive Design** for mobile & desktop
-- Friendly **PNG-themed branding**
+A professional, smooth, and friendly web wallet application for Papua New Guinea users to manage CellMoni transactions. Fully built with Node.js, Express, and a modern animated frontend.
 
 ---
 
-## 🛠 Tech Stack
-- **Backend:** Node.js, Express.js
-- **Frontend:** HTML5, CSS3, JavaScript
-- **File Uploads:** Multer
-- **Deployment:** Render
+## Project Structure
+
+jayglo-cellmoni-wallet/ ├─ public/ │  ├─ css/ │  │  └─ style.css │  ├─ js/ │  │  └─ app.js │  ├─ login.html │  ├─ register.html │  ├─ deposit.html │  ├─ withdraw.html │  ├─ history.html │  └─ dashboard.html ├─ uploads/ ├─ server.js ├─ package.json ├─ package-lock.json └─ README.md
 
 ---
 
-## 📂 Project Structure
+## Features
 
-jayglo-cellmoni-wallet/ │ ├── public/               # Static files (HTML, CSS, Images, JS) │   ├── css/               # Stylesheets │   ├── images/            # Logos and icons │   ├── index.html         # Home page │   ├── register.html      # Registration page │   └── login.html         # Login page │ ├── uploads/               # Uploaded proofs for deposits/withdrawals │ ├── server.js              # Express backend server │ ├── package.json           # Dependencies and scripts │ └── README.md              # Documentation
-
----
-
-## 📦 Installation (Local Development)
-1. **Clone the repository**  
-   ```bash
-   git clone https://github.com/your-username/jayglo-cellmoni-wallet.git
-   cd jayglo-cellmoni-wallet
-
-2. Install dependencies
-
-npm install
-
-
-3. Run locally
-
-node server.js
+- **User Registration & Login**: Easy and secure signup/login system.
+- **Deposit & Withdrawal**: Upload proof for transactions.
+- **Transaction History**: View all deposits and withdrawals.
+- **Live User Count**: See current active users.
+- **Live Testimonials**: Display feedback from users.
+- **Responsive UI**: Works on mobile and desktop devices.
+- **Colorful and Animated Interface**: Smooth friendly professional design.
+- **No Logos**: Clean text-based branding.

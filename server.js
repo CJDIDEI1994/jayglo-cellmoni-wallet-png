@@ -10,6 +10,10 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, "public")));
 
+// Ensure uploads folder exists
+const fs = require("fs");
+if (!fs.existsSync("uploads")) fs.mkdirSync("uploads");
+
 // File upload configuration
 const storage = multer.diskStorage({
   destination: (req, file, cb) => cb(null, "uploads/"),
@@ -20,18 +24,12 @@ const upload = multer({ storage });
 // In-memory data
 let users = [];
 let transactions = [];
-let testimonials = [
-  { name: "Grains", message: "Quick and easy deposit!" },
-  { name: "Salbung", message: "I love using CellMoni via Jayglo Agent!" },
-  { name: "Shermila", message: "Fast withdrawals every time." },
-  { name: "Kaylor", message: "Reliable and trustworthy." }
-];
+let testimonials = []; // You can fill later with PNG names
 
 // Routes
-app.get("/", (req, res) => {
-  res.sendFile(path.join(__dirname, "public", "index.html"));
-});
+app.get("/", (req, res) => res.sendFile(path.join(__dirname, "public", "index.html")));
 
+// Registration
 app.post("/register", (req, res) => {
   const { phone, password } = req.body;
   if (!phone || !password) return res.json({ success: false, message: "All fields required" });
@@ -41,6 +39,7 @@ app.post("/register", (req, res) => {
   res.json({ success: true, message: "Registration successful!" });
 });
 
+// Login
 app.post("/login", (req, res) => {
   const { phone, password } = req.body;
   const user = users.find(u => u.phone === phone && u.password === password);
@@ -48,32 +47,39 @@ app.post("/login", (req, res) => {
   else res.json({ success: false, message: "Invalid credentials" });
 });
 
+// Deposit
 app.post("/deposit", upload.single("depositProof"), (req, res) => {
   const { bank, cellmoniNumber, amount } = req.body;
   const proof = req.file ? req.file.filename : "";
+  if (!bank || !cellmoniNumber || !amount || !proof) {
+    return res.json({ success: false, message: "All fields required" });
+  }
   transactions.push({ type: "Deposit", bank, cellmoniNumber, amount, proof, date: new Date() });
-  res.json({ message: `Deposit submitted! Amount: K${amount}` });
+  res.json({ success: true, message: `Deposit submitted! Amount: K${amount}` });
 });
 
+// Withdraw
 app.post("/withdraw", upload.single("withdrawProof"), (req, res) => {
   const { bank, accountNumber, amount } = req.body;
   const proof = req.file ? req.file.filename : "";
+  if (!bank || !accountNumber || !amount || !proof) {
+    return res.json({ success: false, message: "All fields required" });
+  }
   transactions.push({ type: "Withdraw", bank, accountNumber, amount, proof, date: new Date(), withdrawalID: 19070 });
-  res.json({ message: `Withdrawal submitted! Amount: K${amount}` });
+  res.json({ success: true, message: `Withdrawal submitted! Amount: K${amount}` });
 });
 
-app.get("/history", (req, res) => {
-  res.json(transactions);
-});
+// Transaction history
+app.get("/history", (req, res) => res.json(transactions));
 
-app.get("/live-users", (req, res) => {
-  res.json({ count: users.length });
-});
+// Live user count
+app.get("/live-users", (req, res) => res.json({ count: users.length }));
 
-app.get("/testimonials", (req, res) => {
-  res.json(testimonials);
-});
+// Testimonials
+app.get("/testimonials", (req, res) => res.json(testimonials));
 
+// 404 handler
 app.use((req, res) => res.status(404).send("Page not found"));
 
+// Start server
 app.listen(PORT, () => console.log(`✅ Jayglo CellMoni Agent running on port ${PORT}`));

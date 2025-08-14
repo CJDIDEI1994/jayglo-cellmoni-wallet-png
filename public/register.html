@@ -3,26 +3,61 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Register - Jayglo</title>
+<title>Register - Jayglo CellMoni Agent</title>
 <link rel="stylesheet" href="css/style.css">
-<script src="js/app.js" defer></script>
+<style>
+body { font-family: Arial, sans-serif; background: linear-gradient(120deg, #ff9a9e, #fad0c4); color: #333; }
+.header { text-align: center; padding: 20px; animation: fadeInDown 1s; }
+.promo-banner { background-color: #ff6f61; color: white; padding: 5px; font-weight: bold; animation: slideLeft 10s linear infinite; }
+.form-container { max-width: 350px; margin: 30px auto; padding: 20px; background: rgba(255,255,255,0.9); border-radius: 10px; box-shadow: 0 0 15px rgba(0,0,0,0.2); animation: fadeInUp 1s; }
+input, button { width: 100%; padding: 10px; margin: 10px 0; border-radius: 5px; border: 1px solid #ccc; }
+.submit-btn { background-color: #ff4d4d; color: white; font-weight: bold; border: none; cursor: pointer; transition: 0.3s; }
+.submit-btn:hover { background-color: #e60000; }
+.footer { text-align: center; margin-top: 20px; }
+@keyframes fadeInDown { from {opacity:0; transform: translateY(-50px);} to {opacity:1; transform:translateY(0);} }
+@keyframes fadeInUp { from {opacity:0; transform: translateY(50px);} to {opacity:1; transform:translateY(0);} }
+@keyframes slideLeft { 0% {transform: translateX(100%);} 100% {transform: translateX(-100%);} }
+</style>
 </head>
 <body>
-<div class="header"><h1>Jayglo CellMoni Agent</h1></div>
-<marquee class="promo-banner" behavior="scroll">Register and enjoy 5GB data K5!</marquee>
+
+<div class="header">
+    <h1>Jayglo CellMoni Agent</h1>
+</div>
+
+<marquee class="promo-banner">Baim 5GB data long K5 tasol wantaim CellMoni | Pay water bill, PNG Air ticket, 100% bonus topup | Dial *888#</marquee>
+
 <div class="form-container">
-<h2>Register</h2>
-<form action="/register" method="POST">
-<label>Phone Number:</label>
-<input type="text" name="phone" maxlength="8" required>
-<label>Password:</label>
-<input type="password" name="password" required>
-<button type="submit" class="submit-btn">Register</button>
-</form>
-<p>Already have account? <a href="login.html">Login</a></p>
+    <h2>Register</h2>
+    <form id="registerForm">
+        <input type="text" name="username" placeholder="Username" required>
+        <input type="text" name="phone" placeholder="8-digit CellMoni Number" maxlength="8" required>
+        <input type="password" name="password" placeholder="Password" required>
+        <button type="submit" class="submit-btn">Register</button>
+    </form>
+    <p style="text-align:center;">Already have an account? <a href="login.html">Login here</a></p>
 </div>
+
 <div class="footer">
-<button onclick="window.location.href='https://wa.me/71634839'" class="submit-btn">Contact Customer Service</button>
+    <button onclick="window.location.href='https://wa.me/71634839'" class="submit-btn">Contact Customer Service</button>
 </div>
+
+<script>
+const form = document.getElementById("registerForm");
+form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const formData = new FormData(form);
+    const data = Object.fromEntries(formData.entries());
+    const res = await fetch("/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data)
+    });
+    const json = await res.json();
+    alert(json.message);
+    if(json.redirect) window.location.href = json.redirect;
+});
+</script>
+
 </body>
 </html>

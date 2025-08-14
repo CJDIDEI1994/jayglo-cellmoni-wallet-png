@@ -12,9 +12,11 @@ body {
     background-color: #ff4d4d; /* Light red header */
     color: white;
     text-align: center;
-    padding: 15px 0;
-    font-size: 24px;
-    font-weight: bold;
+    padding: 12px 0;          /* slightly less padding for neatness */
+    font-size: 28px;           /* professional standard size */
+    font-weight: 600;          /* medium-bold */
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; /* clean, professional font */
+    margin: 0;
 }
 
 /* Promo Banner Marquee */

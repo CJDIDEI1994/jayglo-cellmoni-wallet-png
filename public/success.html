@@ -3,41 +3,68 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Transaction Received - Jayglo CellMoni Agent</title>
+<title>Success - Jayglo CellMoni Agent</title>
 <link rel="stylesheet" href="css/style.css">
+<style>
+/* Success Sticker */
+.success-container {
+    max-width: 400px;
+    margin: 50px auto;
+    padding: 25px;
+    border-radius: 12px;
+    background-color: #ff4d4d;
+    color: #fff;
+    text-align: center;
+    font-weight: bold;
+    font-size: 18px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+    animation: popIn 0.6s ease;
+}
+
+/* Pop-in animation */
+@keyframes popIn {
+    0% { transform: scale(0); opacity: 0; }
+    70% { transform: scale(1.2); opacity: 1; }
+    100% { transform: scale(1); opacity: 1; }
+}
+
+/* Success icon */
+.success-icon {
+    font-size: 50px;
+    margin-bottom: 15px;
+}
+</style>
 </head>
 <body>
 
 <div class="header">
-    <h1>Jayglo CellMoni Agent</h1>
+    <h1 class="header-title">Jayglo CellMoni Agent</h1>
 </div>
 
-<div class="form-container">
-    <h2>Transaction Received!</h2>
-    <p id="successMessage">
-        Thank you for your transaction. Your deposit or withdrawal has been received and is being processed.  
-        Trusted by Papua New Guineans.
-    </p>
-    <a href="dashboard.html"><button class="submit-btn">Go to Dashboard</button></a>
+<div class="success-container">
+    <div class="success-icon">✔️</div>
+    <div id="successMessage">Success! Your transaction has been received.</div>
 </div>
 
 <div class="footer">
-    <a href="https://wa.me/71634839" target="_blank">
-        <button class="whatsapp-btn">Contact Customer Service</button>
+    <a href="dashboard.html">
+        <button class="whatsapp-btn">Back to Dashboard</button>
     </a>
 </div>
 
 <script>
+// Get transaction type from URL
 const urlParams = new URLSearchParams(window.location.search);
 const type = urlParams.get('type');
-const msgEl = document.getElementById("successMessage");
+const successMessage = document.getElementById('successMessage');
 
-if(type === "deposit"){
-    msgEl.innerHTML = "Your deposit has been received and is being processed. Thank you for choosing Jayglo CellMoni Agent. Trusted by Papua New Guineans.";
-} else if(type === "withdraw"){
-    msgEl.innerHTML = "Your withdrawal has been received and is being processed. Thank you for choosing Jayglo CellMoni Agent. Trusted by Papua New Guineans.";
+if(type === 'deposit') {
+    successMessage.innerText = "Success! Your deposit payment proof has been received.";
+} else if(type === 'withdraw') {
+    successMessage.innerText = "Success! Your withdrawal request has been received.";
+} else {
+    successMessage.innerText = "Success! Your transaction has been received.";
 }
 </script>
-
 </body>
 </html>

@@ -5,51 +5,43 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Dashboard - Jayglo CellMoni Agent</title>
 <link rel="stylesheet" href="css/style.css">
+<style>
+.dashboard {
+    text-align: center;
+    padding: 30px;
+    animation: fadeIn 1s ease-in-out;
+}
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+.dashboard a {
+    display: inline-block;
+    margin: 10px;
+    padding: 10px 20px;
+    background: #28a745;
+    color: white;
+    text-decoration: none;
+    border-radius: 8px;
+}
+.dashboard a:hover {
+    background: #218838;
+}
+</style>
 </head>
 <body>
 
 <div class="header">
-    <h1>Jayglo CellMoni Agent</h1>
+    <h1>Welcome to Your Dashboard</h1>
 </div>
 
-<marquee class="promo-banner" behavior="scroll" direction="left">
-    Baim 5GB data long K5 tasol wantaim CellMoni | Pay water bill, PNG Air ticket, 100% bonus topup | Dial *888#
-</marquee>
-
-<nav>
-    <a href="dashboard.html">Dashboard</a>
+<div class="dashboard">
+    <p>Manage your CellMoni transactions easily.</p>
     <a href="deposit.html">Deposit</a>
     <a href="withdraw.html">Withdraw</a>
-    <a href="history.html">History</a>
+    <a href="history.html">Transaction History</a>
     <a href="index.html">Logout</a>
-</nav>
-
-<div class="form-container">
-    <h2>Welcome to Your Dashboard</h2>
-    <div class="live-stats">
-        Active Users: <span id="activeUsers">0</span>
-    </div>
-    <div class="testimonials">
-        <marquee behavior="scroll" direction="left" scrollamount="4" id="testimonials">
-            Welcome to Jayglo! Fast deposits & withdrawals across PNG! | Trusted by hundreds of users every day!
-        </marquee>
-    </div>
 </div>
-
-<div class="footer">
-    <a href="https://wa.me/71634839" target="_blank">
-        <button class="whatsapp-btn">Contact Customer Service</button>
-    </a>
-</div>
-
-<script>
-    // Simulate live users
-    let users = 120;
-    setInterval(() => {
-        users += Math.floor(Math.random() * 3) - 1; // fluctuates ±1
-        document.getElementById("activeUsers").textContent = users;
-    }, 2000);
-</script>
 
 </body>
 </html>

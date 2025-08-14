@@ -17,7 +17,7 @@ const storage = multer.diskStorage({
 });
 const upload = multer({ storage });
 
-// In-memory data
+// In-memory data (demo only)
 let users = [];
 let transactions = [];
 let testimonials = [
@@ -27,25 +27,35 @@ let testimonials = [
   { name: "Kaylor", message: "Reliable and trustworthy." }
 ];
 
-// Home/Dashboard page
+// Home
 app.get("/", (req, res) => {
   res.sendFile(path.join(__dirname, "public", "index.html"));
 });
 
 // Registration
 app.post("/register", (req, res) => {
-  const { username, phone, password } = req.body; // updated field names
-  if (!username || !phone || !password) return res.json({ message: "All fields required" });
-  users.push({ username, phone, password });
+  const { cellmoniNumber, password } = req.body;
+  if (!cellmoniNumber || !password) {
+    return res.json({ message: "All fields required" });
+  }
+  users.push({ phone: cellmoniNumber, password });
   res.json({ message: "Registration successful!" });
 });
 
 // Login
 app.post("/login", (req, res) => {
-  const { phone, password } = req.body; // updated field name
+  const { phone, password } = req.body;
   const user = users.find(u => u.phone === phone && u.password === password);
-  if (user) res.json({ message: "Login successful!" });
-  else res.json({ message: "Invalid credentials" });
+  if (user) {
+    res.json({ message: "Login successful!" });
+  } else {
+    res.json({ message: "Invalid credentials" });
+  }
+});
+
+// Dashboard route
+app.get("/dashboard", (req, res) => {
+  res.sendFile(path.join(__dirname, "public", "dashboard.html"));
 });
 
 // Deposit
@@ -65,15 +75,21 @@ app.post("/withdraw", upload.single("withdrawProof"), (req, res) => {
 });
 
 // Transaction history
-app.get("/history", (req, res) => res.json(transactions));
+app.get("/history", (req, res) => {
+  res.json(transactions);
+});
 
 // Live user count
-app.get("/live-users", (req, res) => res.json({ count: users.length }));
+app.get("/live-users", (req, res) => {
+  res.json({ count: users.length });
+});
 
 // Live testimonials
-app.get("/testimonials", (req, res) => res.json(testimonials));
+app.get("/testimonials", (req, res) => {
+  res.json(testimonials);
+});
 
-// 404 handler
+// 404
 app.use((req, res) => res.status(404).send("Page not found"));
 
 // Start server

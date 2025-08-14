@@ -12,13 +12,13 @@
     <h1>Jayglo CellMoni Agent</h1>
 </div>
 
-<marquee class="promo-banner">
+<marquee class="promo-banner" behavior="scroll" direction="left">
     Baim 5GB data long K5 tasol wantaim CellMoni | Pay water bill, PNG Air ticket, 100% bonus topup | Dial *888#
 </marquee>
 
 <div class="form-container">
     <h2>Login</h2>
-    <form id="loginForm">
+    <form action="/login" method="POST">
         <label for="phone">CellMoni 8-digit Number:</label>
         <input type="text" id="phone" name="phone" maxlength="8" placeholder="Enter 8-digit number" required>
 
@@ -35,27 +35,6 @@
         <button class="whatsapp-btn">Contact Customer Service</button>
     </a>
 </div>
-
-<script>
-document.getElementById("loginForm").addEventListener("submit", async function(e) {
-    e.preventDefault();
-    const phone = document.getElementById("phone").value;
-    const password = document.getElementById("password").value;
-
-    const res = await fetch("/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ phone, password })
-    });
-    const data = await res.json();
-
-    if (data.message === "Login successful!") {
-        window.location.href = "/dashboard";
-    } else {
-        alert(data.message);
-    }
-});
-</script>
 
 </body>
 </html>

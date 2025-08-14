@@ -6,6 +6,11 @@ if (registerForm) {
         const phone = document.getElementById("phone").value.trim();
         const password = document.getElementById("password").value.trim();
 
+        if (!phone || !password) {
+            showMessage("Please enter both phone and password.");
+            return;
+        }
+
         fetch("/register", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -15,6 +20,8 @@ if (registerForm) {
         .then(data => {
             showMessage(data.message);
             if(data.success){
+                // Store success message for login page
+                localStorage.setItem("registerSuccessMessage", data.message);
                 setTimeout(()=> window.location.href="login.html", 1000);
             }
         })
@@ -47,7 +54,15 @@ if (loginForm) {
     });
 }
 
+// Show message
 function showMessage(msg){
     const msgEl = document.getElementById("message");
     if(msgEl) msgEl.innerText = msg;
+}
+
+// Display registration success message on login page
+const regMsg = localStorage.getItem("registerSuccessMessage");
+if (regMsg) {
+    showMessage(regMsg);
+    localStorage.removeItem("registerSuccessMessage");
 }

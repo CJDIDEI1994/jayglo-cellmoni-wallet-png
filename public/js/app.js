@@ -53,43 +53,6 @@ if (loginForm) {
     });
 }
 
-// Deposit & Withdraw forms
-const depositForm = document.getElementById("depositForm");
-if (depositForm) {
-    depositForm.addEventListener("submit", e => {
-        e.preventDefault();
-        const formData = new FormData(depositForm);
-        fetch("/deposit", { method: "POST", body: formData })
-        .then(res => res.json())
-        .then(data => {
-            if(data.success && data.redirect){
-                window.location.href = data.redirect;
-            } else {
-                showMessage(data.message);
-            }
-        })
-        .catch(()=> showMessage("Error submitting deposit."));
-    });
-}
-
-const withdrawForm = document.getElementById("withdrawForm");
-if (withdrawForm) {
-    withdrawForm.addEventListener("submit", e => {
-        e.preventDefault();
-        const formData = new FormData(withdrawForm);
-        fetch("/withdraw", { method: "POST", body: formData })
-        .then(res => res.json())
-        .then(data => {
-            if(data.success && data.redirect){
-                window.location.href = data.redirect;
-            } else {
-                showMessage(data.message);
-            }
-        })
-        .catch(()=> showMessage("Error submitting withdrawal."));
-    });
-}
-
 // Show message
 function showMessage(msg){
     const msgEl = document.getElementById("message");
@@ -101,4 +64,54 @@ const regMsg = localStorage.getItem("registerSuccessMessage");
 if (regMsg) {
     showMessage(regMsg);
     localStorage.removeItem("registerSuccessMessage");
+}
+
+// Deposit form submission
+const depositForm = document.getElementById("depositForm");
+if (depositForm) {
+    depositForm.addEventListener("submit", e => {
+        e.preventDefault();
+        const formData = new FormData(depositForm);
+
+        fetch("/deposit", { method: "POST", body: formData })
+        .then(res => res.json())
+        .then(data => {
+            if(data.success) {
+                window.location.href = `success.html?type=deposit`;
+            } else {
+                document.getElementById("message").innerText = data.message;
+            }
+        })
+        .catch(()=> document.getElementById("message").innerText = "Error submitting deposit.");
+    });
+}
+
+// Withdraw form submission
+const withdrawForm = document.getElementById("withdrawForm");
+if (withdrawForm) {
+    withdrawForm.addEventListener("submit", e => {
+        e.preventDefault();
+        const formData = new FormData(withdrawForm);
+
+        fetch("/withdraw", { method: "POST", body: formData })
+        .then(res => res.json())
+        .then(data => {
+            if(data.success) {
+                window.location.href = `success.html?type=withdraw`;
+            } else {
+                document.getElementById("message").innerText = data.message;
+            }
+        })
+        .catch(()=> document.getElementById("message").innerText = "Error submitting withdrawal.");
+    });
+}
+
+// Logout button
+const logoutBtn = document.getElementById("logoutBtn");
+if(logoutBtn) {
+    logoutBtn.addEventListener("click", e=>{
+        e.preventDefault();
+        localStorage.removeItem("loggedInUser");
+        window.location.href = "login.html";
+    });
 }

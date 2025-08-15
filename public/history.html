@@ -61,22 +61,39 @@
 </style>
 <script>
 async function loadHistory() {
-    const res = await fetch('/history');
-    const data = await res.json();
-    const tableBody = document.getElementById('history-body');
-    data.forEach(t => {
-        const row = document.createElement('tr');
-        row.innerHTML = `
-            <td>${t.type}</td>
-            <td>${t.amount}</td>
-            <td>${t.proof || "-"}</td>
-            <td>${t.bank || "-"}</td>
-            <td>${t.account || "-"}</td>
-            <td>${new Date(t.date).toLocaleString()}</td>
-            <td class="${t.status.toLowerCase()}">${t.status || "Pending"}</td>
-        `;
-        tableBody.appendChild(row);
-    });
+    try {
+        const res = await fetch('/history');
+        const data = await res.json();
+        const tableBody = document.getElementById('history-body');
+        tableBody.innerHTML = ""; // Clear previous data
+
+        if(data.length === 0){
+            const row = document.createElement('tr');
+            row.innerHTML = `<td colspan="7">No transactions yet.</td>`;
+            tableBody.appendChild(row);
+            return;
+        }
+
+        data.forEach(t => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td>${t.type}</td>
+                <td>${t.amount}</td>
+                <td>${t.proof || "-"}</td>
+                <td>${t.bank || "-"}</td>
+                <td>${t.accountNumber || t.cellmoniNumber || "-"}</td>
+                <td>${new Date(t.date).toLocaleString()}</td>
+                <td class="status-${t.status ? t.status.toLowerCase() : 'pending'}">
+                    ${t.status || "Pending"}
+                </td>
+            `;
+            tableBody.appendChild(row);
+        });
+    } catch (err) {
+        console.error(err);
+        const tableBody = document.getElementById('history-body');
+        tableBody.innerHTML = `<tr><td colspan="7">Error loading transactions.</td></tr>`;
+    }
 }
 window.onload = loadHistory;
 </script>

@@ -1,108 +1,109 @@
-const express = require("express");
-const path = require("path");
-const multer = require("multer");
-const fs = require("fs");
-const app = express();
+document.addEventListener("DOMContentLoaded", () => {
+    // ================= Redirect to login if not logged in =================
+    const userPhone = localStorage.getItem("loggedInUser");
+    if(!userPhone) {
+        window.location.href = "login.html";
+        return;
+    }
 
-const PORT = process.env.PORT || 3000;
+    // ================= Load User Info =================
+    async function loadUserInfo(phone){
+        try{
+            const res = await fetch(`/getUser?phone=${phone}`);
+            const data = await res.json();
+            if(data.success){
+                const userInfoEl = document.getElementById("user-info");
+                if(userInfoEl){
+                    userInfoEl.innerHTML = `<img src="uploads/${data.profilePhoto}" style="width:40px;height:40px;border-radius:50%;margin-right:8px;vertical-align:middle;"> ${data.fullName} | ${data.phone}`;
+                }
+                loadHistory(); // Load history after user info
+            }
+        } catch(err){ console.error(err); }
+    }
 
-// Middleware
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-app.use(express.static(path.join(__dirname, "public")));
+    // ================= Load Transaction History =================
+    async function loadHistory(){
+        const res = await fetch('/history');
+        const data = await res.json();
+        const tableBody = document.getElementById('history-body');
+        if(tableBody){
+            tableBody.innerHTML = ""; // Clear previous rows
+            data.forEach(t=>{
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${t.type}</td>
+                    <td>${t.amount}</td>
+                    <td>${t.proof || "-"}</td>
+                    <td>${t.bank || "-"}</td>
+                    <td>${t.accountNumber || t.cellmoniNumber || "-"}</td>
+                    <td>${new Date(t.date).toLocaleString()}</td>
+                    <td class="${t.status.toLowerCase()}">${t.status || "Pending"}</td>
+                `;
+                tableBody.appendChild(row);
+            });
+        }
+    }
 
-// Ensure uploads folder exists
-if (!fs.existsSync("uploads")) fs.mkdirSync("uploads");
+    loadUserInfo(userPhone);
 
-// File upload configuration
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => cb(null, "uploads/"),
-  filename: (req, file, cb) => cb(null, Date.now() + "-" + file.originalname),
+    // ================= Logout =================
+    const logoutBtn = document.getElementById("logoutBtn");
+    if(logoutBtn){
+        logoutBtn.addEventListener("click", e=>{
+            e.preventDefault();
+            localStorage.removeItem("loggedInUser");
+            window.location.href = "login.html";
+        });
+    }
+
+    // ================= Deposit Submission =================
+    const depositForm = document.getElementById("depositForm");
+    if(depositForm){
+        depositForm.addEventListener("submit", e=>{
+            e.preventDefault();
+            const formData = new FormData(depositForm);
+            fetch("/deposit",{method:"POST",body:formData})
+            .then(res=>res.json())
+            .then(data=>{
+                showMessage(data.message,"deposit-message");
+                if(data.success) depositForm.reset();
+            })
+            .catch(()=> showMessage("Error submitting deposit.","deposit-message"));
+        });
+    }
+
+    // ================= Withdraw Submission =================
+    const withdrawForm = document.getElementById("withdrawForm");
+    if(withdrawForm){
+        withdrawForm.addEventListener("submit", e=>{
+            e.preventDefault();
+            const formData = new FormData(withdrawForm);
+            fetch("/withdraw",{method:"POST",body:formData})
+            .then(res=>res.json())
+            .then(data=>{
+                showMessage(data.message,"withdraw-message");
+                if(data.success) withdrawForm.reset();
+            })
+            .catch(()=> showMessage("Error submitting withdrawal.","withdraw-message"));
+        });
+    }
+
+    // ================= Navbar Section Switching =================
+    const navLinks = document.querySelectorAll('.nav-link');
+    navLinks.forEach(link=>{
+        link.addEventListener('click', e=>{
+            e.preventDefault();
+            document.querySelectorAll('.section').forEach(sec=>sec.classList.remove('active'));
+            const target = document.getElementById(link.dataset.section);
+            if(target) target.classList.add('active');
+            navLinks.forEach(l=>l.classList.remove('active'));
+            link.classList.add('active');
+        });
+    });
+
+    // ================= Customer Service =================
+    document.getElementById("customer-service").addEventListener("click", e=>{
+        e.preventDefault();
+        window.open("https://wa.me/71634839", "_blank");
+    });
 });
-const upload = multer({ storage });
-
-// In-memory data
-let users = [];
-let transactions = [];
-let testimonials = [];
-
-// Root redirect
-app.get("/", (req, res) => res.redirect("/login.html"));
-
-// Registration
-app.post("/register", upload.fields([{ name: "profilePhoto" }, { name: "idPhoto" }]), (req, res) => {
-  const { fullName, phone, password, confirmPassword } = req.body;
-  const profilePhoto = req.files["profilePhoto"] ? req.files["profilePhoto"][0].filename : "";
-  const idPhoto = req.files["idPhoto"] ? req.files["idPhoto"][0].filename : "";
-
-  if (!fullName || !phone || !password || !confirmPassword || !profilePhoto || !idPhoto) {
-    return res.json({ success: false, message: "All fields required" });
-  }
-  if (password !== confirmPassword) {
-    return res.json({ success: false, message: "Passwords do not match" });
-  }
-  const exists = users.find(u => u.phone === phone);
-  if (exists) return res.json({ success: false, message: "User already exists" });
-
-  users.push({ fullName, phone, password, profilePhoto, idPhoto });
-  res.json({ success: true, message: "Registration successful!" });
-});
-
-// Login
-app.post("/login", (req, res) => {
-  const { phone, password } = req.body;
-  const user = users.find(u => u.phone === phone && u.password === password);
-  if (user) res.json({ success: true, message: "Login successful!" });
-  else res.json({ success: false, message: "Invalid credentials" });
-});
-
-// Get single user info
-app.get("/getUser", (req, res) => {
-  const { phone } = req.query;
-  const user = users.find(u => u.phone === phone);
-  if (user) {
-    res.json({ success: true, fullName: user.fullName, phone: user.phone, profilePhoto: user.profilePhoto });
-  } else {
-    res.json({ success: false, message: "User not found" });
-  }
-});
-
-// Deposit
-app.post("/deposit", upload.single("depositProof"), (req, res) => {
-  const { bank, cellmoniNumber, amount } = req.body;
-  const proof = req.file ? req.file.filename : "";
-  if (!bank || !cellmoniNumber || !amount || !proof) {
-    return res.json({ success: false, message: "All fields required" });
-  }
-  transactions.push({ type: "Deposit", bank, cellmoniNumber, amount, proof, status: "Pending", date: new Date() });
-  res.json({ success: true, message: `Deposit K${amount} received!` });
-});
-
-// Withdraw
-app.post("/withdraw", upload.single("withdrawProof"), (req, res) => {
-  const { bank, accountNumber, amount } = req.body;
-  const proof = req.file ? req.file.filename : "";
-  if (!bank || !accountNumber || !amount || !proof) {
-    return res.json({ success: false, message: "All fields required" });
-  }
-  transactions.push({ type: "Withdraw", bank, accountNumber, amount, proof, status: "Pending", date: new Date() });
-  res.json({ success: true, message: `Withdrawal K${amount} received!` });
-});
-
-// Transaction history
-app.get("/history", (req, res) => res.json(transactions));
-
-// Live user count
-app.get("/live-users", (req, res) => res.json({ count: users.length }));
-
-// Testimonials
-app.get("/testimonials", (req, res) => res.json(testimonials));
-
-// Serve success page
-app.get("/success.html", (req, res) => res.sendFile(path.join(__dirname, "public", "success.html")));
-
-// 404 handler
-app.use((req, res) => res.status(404).send("Page not found"));
-
-// Start server
-app.listen(PORT, () => console.log(`✅ Jayglo CellMoni Agent running on port ${PORT}`));

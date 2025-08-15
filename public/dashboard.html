@@ -6,7 +6,6 @@
 <title>Dashboard - Jayglo CellMoni Agent</title>
 <link rel="stylesheet" href="css/style.css" />
 <style>
-  /* ===== Scoped styles so we don't affect other pages ===== */
   .dash-actions {
     display: flex;
     gap: 14px;
@@ -19,7 +18,7 @@
     height: 78px;
     border-radius: 50%;
     border: none;
-    background-color: #ff4d4d; /* red to match your theme */
+    background-color: #ff4d4d;
     color: #fff;
     font-size: 12px;
     font-weight: 700;
@@ -32,7 +31,7 @@
   }
   .dash-actions .circle-btn:active { transform: scale(0.98); }
   .dash-actions .circle-btn.loading {
-    background-color: #b30000; /* dark red while loading */
+    background-color: #b30000;
     pointer-events: none;
   }
   .dash-actions .circle-btn .spinner {
@@ -47,138 +46,114 @@
   }
   @keyframes dashSpin { from { transform: rotate(0); } to { transform: rotate(360deg); } }
 
-  /* keep your existing .form-container spacing nice under the buttons */
-  .form-container .section-spacer { height: 8px; }
+  .live-stats { margin-top:20px; text-align:center; font-size:16px; font-weight:600; }
+  .testimonials { margin-top:12px; font-size:14px; color:#333; text-align:center; }
+  .header {
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:12px 20px;
+    background-color:#ff4d4d;
+    color:white;
+    position:sticky;
+    top:0;
+    z-index:1000;
+  }
 </style>
 </head>
 <body>
-  <!-- Header -->
-  <div class="header" style="display:flex;justify-content:space-between;align-items:center;padding:12px 20px;">
-    <h1>Jayglo CellMoni Agent</h1>
-    <div id="user-info" style="font-size:16px;font-weight:500;color:white;"></div>
+
+<!-- Header -->
+<div class="header">
+  <h1 style="margin:0;font-size:20px;">JAYGLO CELLMONI AGENT</h1>
+  <a href="#" id="logoutBtn" style="color:white;font-weight:500;text-decoration:none;">Logout</a>
+</div>
+
+<div class="form-container" style="padding:20px;">
+  <!-- User Name -->
+  <h2 id="user-name" style="margin-bottom:8px;font-size:18px;">Loading user...</h2>
+  <h2 style="margin-top:0;">Welcome to Your Dashboard</h2>
+
+  <!-- Action Buttons -->
+  <div class="dash-actions" aria-label="Quick actions">
+    <button class="circle-btn" data-target="deposit.html">Deposit</button>
+    <button class="circle-btn" data-target="withdraw.html">Withdraw</button>
+    <button class="circle-btn" data-target="history.html">History</button>
+    <button class="circle-btn" data-target="https://wa.me/71634839" data-external="1">Customer<br/>Service</button>
   </div>
 
-  <!-- Promo -->
-  <marquee class="promo-banner" behavior="scroll" direction="left">
-    Baim 5GB data long K5 tasol wantaim CellMoni | Pay water bill, PNG Air ticket, 100% bonus topup | Dial *888#
-  </marquee>
-
-  <!-- Nav -->
-  <nav>
-    <a href="dashboard.html" class="active">Dashboard</a>
-    <a href="deposit.html">Deposit</a>
-    <a href="withdraw.html">Withdraw</a>
-    <a href="history.html">History</a>
-    <a href="#" id="logoutBtn">Logout</a>
-  </nav>
-
-  <!-- Main -->
-  <div class="form-container">
-    <h2>Welcome to Your Dashboard</h2>
-
-    <!-- NEW: Action buttons (non-destructive; just added) -->
-    <div class="dash-actions" aria-label="Quick actions">
-      <button class="circle-btn" data-target="history.html">History</button>
-      <button class="circle-btn" data-target="deposit.html">Deposit</button>
-      <button class="circle-btn" data-target="withdraw.html">Withdraw</button>
-      <button class="circle-btn" data-target="https://wa.me/71634839" data-external="1">Customer<br/>Service</button>
-    </div>
-
-    <div class="section-spacer"></div>
-
-    <!-- Live stats -->
-    <div class="live-stats">
-      Active Users: <span id="activeUsers">0</span>
-    </div>
-
-    <!-- Testimonials -->
-    <div class="testimonials">
-      <marquee behavior="scroll" direction="left" scrollamount="4" id="testimonials">
-        Welcome to Jayglo! Fast deposits & withdrawals across PNG! | Trusted by hundreds of users every day!
-      </marquee>
-    </div>
+  <!-- Live Active Users -->
+  <div class="live-stats">
+    Active Users: <span id="activeUsers">0</span>
   </div>
 
-  <!-- Footer -->
-  <div class="footer">
-    <a href="https://wa.me/71634839" target="_blank">
-      <button class="whatsapp-btn">Contact Customer Service</button>
-    </a>
+  <!-- Testimonials -->
+  <div class="testimonials">
+    <marquee behavior="scroll" direction="left" scrollamount="4" id="testimonials">
+      Welcome to Jayglo! Fast deposits & withdrawals across PNG! | Trusted by hundreds of users every day!
+    </marquee>
   </div>
+</div>
 
-  <script src="js/app.js"></script>
-  <script>
-    // Keep the same behavior you already had on dashboard:
-    (function() {
-      // Require auth to view dashboard
-      const user = localStorage.getItem("loggedInUser");
-      if (!user) {
-        window.location.href = "login.html";
-        return;
+<script src="js/app.js"></script>
+<script>
+(function() {
+  const loggedUser = localStorage.getItem("loggedInUser");
+  const userNameEl = document.getElementById("user-name");
+  if (!loggedUser) { window.location.href = "login.html"; return; }
+
+  // Load user name
+  fetch("/getUser?phone=" + encodeURIComponent(loggedUser))
+    .then(r => r.json())
+    .then(data => {
+      if(data.success && userNameEl) userNameEl.textContent = data.fullName;
+      else if(userNameEl) userNameEl.textContent = loggedUser;
+    }).catch(() => { if(userNameEl) userNameEl.textContent = loggedUser; });
+
+  // Live users
+  let usersCount = 120;
+  const activeEl = document.getElementById("activeUsers");
+  if(activeEl){
+    activeEl.textContent = usersCount;
+    setInterval(() => {
+      usersCount += Math.floor(Math.random()*3) - 1;
+      if(usersCount<0) usersCount=0;
+      activeEl.textContent = usersCount;
+    }, 2000);
+  }
+
+  // Load testimonials dynamically
+  fetch("/testimonials")
+    .then(r => r.json())
+    .then(list => {
+      const marq = document.getElementById("testimonials");
+      if(Array.isArray(list) && list.length && marq){
+        marq.textContent = list.map(t => `${t.name}: ${t.message}`).join(" | ");
       }
+    }).catch(()=>{});
 
-      // Show user info (name + phone + profile pic if available)
-      fetch("/getUser?phone=" + encodeURIComponent(user))
-        .then(r => r.json())
-        .then(d => {
-          const el = document.getElementById("user-info");
-          if (!el) return;
-          if (d.success) {
-            const img = d.profilePhoto ? `<img src="uploads/${d.profilePhoto}" alt="Profile" style="width:40px;height:40px;border-radius:50%;margin-right:8px;vertical-align:middle;object-fit:cover;">` : "";
-            el.innerHTML = `${img}${d.fullName} | ${d.phone}`;
-          } else {
-            el.textContent = user;
-          }
-        }).catch(() => {});
+  // Dashboard button click
+  const btns = document.querySelectorAll(".dash-actions .circle-btn");
+  btns.forEach(btn => {
+    btn.addEventListener("click", ()=>{
+      const label = btn.textContent;
+      btn.textContent = "";
+      btn.classList.add("loading");
+      const spin = document.createElement("div");
+      spin.className = "spinner";
+      btn.appendChild(spin);
 
-      // Active users (same as before)
-      let usersCount = 120;
-      const activeEl = document.getElementById("activeUsers");
-      if (activeEl) {
-        activeEl.textContent = usersCount;
-        setInterval(() => {
-          usersCount += Math.floor(Math.random() * 3) - 1;
-          activeEl.textContent = usersCount;
-        }, 2000);
-      }
+      const target = btn.getAttribute("data-target") || "dashboard.html";
+      const external = btn.getAttribute("data-external") === "1";
 
-      // Testimonials (same as before)
-      fetch("/testimonials").then(r => r.json()).then(list => {
-        const marq = document.getElementById("testimonials");
-        if (Array.isArray(list) && list.length && marq) {
-          marq.textContent = list.map(t => `${t.name}: ${t.message}`).join(" | ");
-        }
-      }).catch(() => {});
+      setTimeout(()=>{
+        if(external) window.open(target,"_blank");
+        else window.location.href = target;
+      }, 600);
+    });
+  });
+})();
+</script>
 
-      // NEW: Button loading + redirect (scoped just to dashboard)
-      const btns = document.querySelectorAll(".dash-actions .circle-btn");
-      btns.forEach(btn => {
-        btn.addEventListener("click", () => {
-          // Loading state
-          const label = btn.textContent;
-          btn.textContent = "";
-          btn.classList.add("loading");
-          const spin = document.createElement("div");
-          spin.className = "spinner";
-          btn.appendChild(spin);
-
-          const target = btn.getAttribute("data-target") || "dashboard.html";
-          const external = btn.getAttribute("data-external") === "1";
-
-          setTimeout(() => {
-            if (external) {
-              window.open(target, "_blank");
-              // restore button quickly for user if they stay on page
-              btn.removeChild(spin);
-              btn.classList.remove("loading");
-              btn.textContent = label;
-            } else {
-              window.location.href = target;
-            }
-          }, 600);
-        });
-      });
-    })();
-  </script>
 </body>
 </html>

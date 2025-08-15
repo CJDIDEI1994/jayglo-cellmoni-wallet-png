@@ -3,68 +3,28 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Success - Jayglo CellMoni Agent</title>
+<title>Transaction Successful - Jayglo</title>
 <link rel="stylesheet" href="css/style.css">
-<style>
-/* Success Sticker */
-.success-container {
-    max-width: 400px;
-    margin: 50px auto;
-    padding: 25px;
-    border-radius: 12px;
-    background-color: #ff4d4d;
-    color: #fff;
-    text-align: center;
-    font-weight: bold;
-    font-size: 18px;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
-    animation: popIn 0.6s ease;
-}
-
-/* Pop-in animation */
-@keyframes popIn {
-    0% { transform: scale(0); opacity: 0; }
-    70% { transform: scale(1.2); opacity: 1; }
-    100% { transform: scale(1); opacity: 1; }
-}
-
-/* Success icon */
-.success-icon {
-    font-size: 50px;
-    margin-bottom: 15px;
-}
-</style>
 </head>
 <body>
-
 <div class="header">
-    <h1 class="header-title">Jayglo CellMoni Agent</h1>
+    <h1>Jayglo CellMoni Agent</h1>
 </div>
 
-<div class="success-container">
-    <div class="success-icon">✔️</div>
-    <div id="successMessage">Success! Your transaction has been received.</div>
+<marquee class="promo-banner" behavior="scroll" direction="left">
+    Thank you for using Jayglo! Your transaction is being processed. | Trusted by hundreds of users daily!
+</marquee>
+
+<div class="form-container" style="text-align:center;">
+    <h2>Transaction Submitted Successfully!</h2>
+    <p>Your transaction is now <strong>Pending</strong>. Please wait while we manually process it.</p>
+    <p>Back to <a href="dashboard.html">Dashboard</a></p>
 </div>
 
 <div class="footer">
-    <a href="dashboard.html">
-        <button class="whatsapp-btn">Back to Dashboard</button>
+    <a href="https://wa.me/71634839" target="_blank">
+        <button class="whatsapp-btn">Contact Customer Service</button>
     </a>
 </div>
-
-<script>
-// Get transaction type from URL
-const urlParams = new URLSearchParams(window.location.search);
-const type = urlParams.get('type');
-const successMessage = document.getElementById('successMessage');
-
-if(type === 'deposit') {
-    successMessage.innerText = "Success! Your deposit payment proof has been received.";
-} else if(type === 'withdraw') {
-    successMessage.innerText = "Success! Your withdrawal request has been received.";
-} else {
-    successMessage.innerText = "Success! Your transaction has been received.";
-}
-</script>
 </body>
 </html>

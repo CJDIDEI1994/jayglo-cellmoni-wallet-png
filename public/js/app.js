@@ -1,4 +1,4 @@
-    // ================= Show message =================
+// ================= Show message =================
 function showMessage(msg){
     const msgEl = document.getElementById("message");
     if(msgEl) msgEl.innerText = msg;
@@ -36,7 +36,7 @@ if (registerForm) {
         formData.append("idPhoto", idPhoto);
 
         fetch("/register", { method: "POST", body: formData })
-            .then(res => res.json().catch(() => { throw new Error("Invalid server response") }))
+            .then(res => res.json())
             .then(data => {
                 showMessage(data.message);
                 if(data.success){
@@ -44,7 +44,7 @@ if (registerForm) {
                     setTimeout(()=> window.location.href="login.html", 1000);
                 }
             })
-            .catch(err => showMessage("Error during registration: " + err.message));
+            .catch(()=> showMessage("Error during registration."));
     });
 }
 
@@ -133,29 +133,31 @@ if(logoutBtn) {
 // ================= User Info for Dashboard =================
 const userPhone = localStorage.getItem("loggedInUser");
 if(userPhone){
-    async function loadUserInfo(phone){
-        try{
-            const res = await fetch(`/getUser?phone=${phone}`);
-            const data = await res.json();
-            if(data.success){
-                const userInfoEl = document.getElementById("user-info");
-                if(userInfoEl){
-                    userInfoEl.innerHTML = `<img src="uploads/${data.profilePhoto}" alt="Profile" style="width:40px; height:40px; border-radius:50%; margin-right:8px; vertical-align:middle;"> ${data.fullName} | ${data.phone}`;
+    window.addEventListener('load', () => {
+        async function loadUserInfo(phone){
+            try{
+                const res = await fetch(`/getUser?phone=${phone}`);
+                const data = await res.json();
+                if(data.success){
+                    const userInfoEl = document.getElementById("user-info");
+                    if(userInfoEl){
+                        userInfoEl.innerHTML = `<img src="uploads/${data.profilePhoto}" alt="Profile" style="width:40px; height:40px; border-radius:50%; margin-right:8px; vertical-align:middle;"> ${data.fullName} | ${data.phone}`;
+                    }
                 }
+            } catch(err){
+                console.error("Error loading user info:", err);
             }
-        } catch(err){
-            console.error("Error loading user info:", err);
         }
-    }
-    loadUserInfo(userPhone);
+        loadUserInfo(userPhone);
+    });
 }
 
 // ================= Load Transaction History =================
-async function loadHistory() {
-    const res = await fetch('/history');
-    const data = await res.json();
-    const tableBody = document.getElementById('history-body');
-    if(tableBody){
+if(document.getElementById('history-body')){
+    window.addEventListener('load', async () => {
+        const res = await fetch('/history');
+        const data = await res.json();
+        const tableBody = document.getElementById('history-body');
         tableBody.innerHTML = ""; // Clear previous rows to avoid duplicates
         data.forEach(t => {
             const row = document.createElement('tr');
@@ -170,6 +172,5 @@ async function loadHistory() {
             `;
             tableBody.appendChild(row);
         });
-    }
+    });
 }
-if(document.getElementById('history-body')) window.onload = loadHistory;

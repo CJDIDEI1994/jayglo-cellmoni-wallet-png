@@ -26,10 +26,10 @@ let users = [];
 let transactions = [];
 let testimonials = [];
 
-// Routes
+// Root redirect
 app.get("/", (req, res) => res.redirect("/login.html"));
 
-// ================= Registration =================
+// Registration
 app.post("/register", upload.fields([{ name: "profilePhoto" }, { name: "idPhoto" }]), (req, res) => {
   const { fullName, phone, password, confirmPassword } = req.body;
   const profilePhoto = req.files["profilePhoto"] ? req.files["profilePhoto"][0].filename : "";
@@ -48,7 +48,7 @@ app.post("/register", upload.fields([{ name: "profilePhoto" }, { name: "idPhoto"
   res.json({ success: true, message: "Registration successful!" });
 });
 
-// ================= Login =================
+// Login
 app.post("/login", (req, res) => {
   const { phone, password } = req.body;
   const user = users.find(u => u.phone === phone && u.password === password);
@@ -56,7 +56,7 @@ app.post("/login", (req, res) => {
   else res.json({ success: false, message: "Invalid credentials" });
 });
 
-// ================= Get single user info =================
+// Get single user info
 app.get("/getUser", (req, res) => {
   const { phone } = req.query;
   const user = users.find(u => u.phone === phone);
@@ -67,58 +67,42 @@ app.get("/getUser", (req, res) => {
   }
 });
 
-// ================= Deposit =================
+// Deposit
 app.post("/deposit", upload.single("depositProof"), (req, res) => {
   const { bank, cellmoniNumber, amount } = req.body;
   const proof = req.file ? req.file.filename : "";
   if (!bank || !cellmoniNumber || !amount || !proof) {
     return res.json({ success: false, message: "All fields required" });
   }
-  transactions.push({
-    type: "Deposit",
-    bank,
-    cellmoniNumber,
-    amount,
-    proof,
-    status: "Pending",
-    date: new Date()
-  });
-  res.json({ success: true, message: `Deposit received! Amount: K${amount}` });
+  transactions.push({ type: "Deposit", bank, cellmoniNumber, amount, proof, status: "Pending", date: new Date() });
+  res.json({ success: true, message: `Deposit K${amount} received!` });
 });
 
-// ================= Withdraw =================
+// Withdraw
 app.post("/withdraw", upload.single("withdrawProof"), (req, res) => {
   const { bank, accountNumber, amount } = req.body;
   const proof = req.file ? req.file.filename : "";
   if (!bank || !accountNumber || !amount || !proof) {
     return res.json({ success: false, message: "All fields required" });
   }
-  transactions.push({
-    type: "Withdraw",
-    bank,
-    accountNumber,
-    amount,
-    proof,
-    status: "Pending",
-    date: new Date()
-  });
-  res.json({ success: true, message: `Withdrawal received! Amount: K${amount}` });
+  transactions.push({ type: "Withdraw", bank, accountNumber, amount, proof, status: "Pending", date: new Date() });
+  res.json({ success: true, message: `Withdrawal K${amount} received!` });
 });
 
-// ================= Transaction History =================
+// Transaction history
 app.get("/history", (req, res) => res.json(transactions));
 
-// ================= Live user count =================
+// Live user count
 app.get("/live-users", (req, res) => res.json({ count: users.length }));
 
-// ================= Testimonials =================
+// Testimonials
 app.get("/testimonials", (req, res) => res.json(testimonials));
 
-// ================= Serve success page =================
+// Serve success page
 app.get("/success.html", (req, res) => res.sendFile(path.join(__dirname, "public", "success.html")));
 
-// ================= 404 handler =================
+// 404 handler
 app.use((req, res) => res.status(404).send("Page not found"));
 
-// ================= Start server =================
+// Start server
 app.listen(PORT, () => console.log(`✅ Jayglo CellMoni Agent running on port ${PORT}`));

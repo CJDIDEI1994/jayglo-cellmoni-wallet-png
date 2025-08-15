@@ -1,6 +1,7 @@
 const express = require("express");
 const path = require("path");
 const multer = require("multer");
+const fs = require("fs");
 const app = express();
 
 const PORT = process.env.PORT || 3000;
@@ -11,7 +12,6 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, "public")));
 
 // Ensure uploads folder exists
-const fs = require("fs");
 if (!fs.existsSync("uploads")) fs.mkdirSync("uploads");
 
 // File upload configuration
@@ -24,28 +24,29 @@ const upload = multer({ storage });
 // In-memory data
 let users = [];
 let transactions = [];
-let testimonials = [];
+let testimonials = []; // Can be populated later
 
 // Routes
-app.get("/", (req, res) => res.sendFile(path.join(__dirname, "public", "login.html")));
+app.get("/", (req, res) => res.redirect("/login.html"));
 
 // Registration
-app.post("/register", upload.fields([{name:"facePhoto"},{name:"idPhoto"}]), (req, res) => {
-  const { fullName, phone, password } = req.body;
-  if (!fullName || !phone || !password || !req.files.facePhoto || !req.files.idPhoto) {
+app.post("/register", upload.fields([{ name: "profilePhoto" }, { name: "idPhoto" }]), (req, res) => {
+  const { fullName, phone, password, confirmPassword } = req.body;
+  const profilePhoto = req.files["profilePhoto"] ? req.files["profilePhoto"][0].filename : "";
+  const idPhoto = req.files["idPhoto"] ? req.files["idPhoto"][0].filename : "";
+
+  if (!fullName || !phone || !password || !confirmPassword || !profilePhoto || !idPhoto) {
     return res.json({ success: false, message: "All fields required" });
   }
+
+  if (password !== confirmPassword) {
+    return res.json({ success: false, message: "Passwords do not match" });
+  }
+
   const exists = users.find(u => u.phone === phone);
   if (exists) return res.json({ success: false, message: "User already exists" });
 
-  users.push({
-    fullName,
-    phone,
-    password,
-    facePhoto: req.files.facePhoto[0].filename,
-    idPhoto: req.files.idPhoto[0].filename
-  });
-
+  users.push({ fullName, phone, password, profilePhoto, idPhoto });
   res.json({ success: true, message: "Registration successful!" });
 });
 
@@ -57,12 +58,12 @@ app.post("/login", (req, res) => {
   else res.json({ success: false, message: "Invalid credentials" });
 });
 
-// Get user info for dashboard
+// Get single user info
 app.get("/getUser", (req, res) => {
   const { phone } = req.query;
   const user = users.find(u => u.phone === phone);
-  if(user){
-    res.json({ success: true, fullName: user.fullName, phone: user.phone, facePhoto: user.facePhoto });
+  if (user) {
+    res.json({ success: true, fullName: user.fullName, phone: user.phone, profilePhoto: user.profilePhoto });
   } else {
     res.json({ success: false, message: "User not found" });
   }
@@ -75,16 +76,8 @@ app.post("/deposit", upload.single("depositProof"), (req, res) => {
   if (!bank || !cellmoniNumber || !amount || !proof) {
     return res.json({ success: false, message: "All fields required" });
   }
-  transactions.push({
-    type: "Deposit",
-    bank,
-    cellmoniNumber,
-    amount,
-    proof,
-    status: "Pending",
-    date: new Date()
-  });
-  res.json({ success: true, message: `Deposit received! Amount: K${amount}` });
+  transactions.push({ type: "Deposit", bank, cellmoniNumber, amount, proof, status: "Pending", date: new Date() });
+  res.redirect("/success.html");
 });
 
 // Withdraw
@@ -94,16 +87,8 @@ app.post("/withdraw", upload.single("withdrawProof"), (req, res) => {
   if (!bank || !accountNumber || !amount || !proof) {
     return res.json({ success: false, message: "All fields required" });
   }
-  transactions.push({
-    type: "Withdraw",
-    bank,
-    accountNumber,
-    amount,
-    proof,
-    status: "Pending",
-    date: new Date()
-  });
-  res.json({ success: true, message: `Withdrawal received! Amount: K${amount}` });
+  transactions.push({ type: "Withdraw", bank, accountNumber, amount, proof, status: "Pending", date: new Date() });
+  res.redirect("/success.html");
 });
 
 // Transaction history
@@ -114,6 +99,9 @@ app.get("/live-users", (req, res) => res.json({ count: users.length }));
 
 // Testimonials
 app.get("/testimonials", (req, res) => res.json(testimonials));
+
+// Serve success page
+app.get("/success.html", (req, res) => res.sendFile(path.join(__dirname, "public", "success.html")));
 
 // 404 handler
 app.use((req, res) => res.status(404).send("Page not found"));

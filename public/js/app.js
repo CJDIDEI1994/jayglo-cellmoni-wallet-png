@@ -1,4 +1,4 @@
-// ================= Show message =================
+    // ================= Show message =================
 function showMessage(msg){
     const msgEl = document.getElementById("message");
     if(msgEl) msgEl.innerText = msg;
@@ -36,7 +36,7 @@ if (registerForm) {
         formData.append("idPhoto", idPhoto);
 
         fetch("/register", { method: "POST", body: formData })
-            .then(res => res.json())
+            .then(res => res.json().catch(() => { throw new Error("Invalid server response") }))
             .then(data => {
                 showMessage(data.message);
                 if(data.success){
@@ -44,7 +44,7 @@ if (registerForm) {
                     setTimeout(()=> window.location.href="login.html", 1000);
                 }
             })
-            .catch(()=> showMessage("Error during registration."));
+            .catch(err => showMessage("Error during registration: " + err.message));
     });
 }
 
@@ -140,7 +140,6 @@ if(userPhone){
             if(data.success){
                 const userInfoEl = document.getElementById("user-info");
                 if(userInfoEl){
-                    // Show name and profile picture
                     userInfoEl.innerHTML = `<img src="uploads/${data.profilePhoto}" alt="Profile" style="width:40px; height:40px; border-radius:50%; margin-right:8px; vertical-align:middle;"> ${data.fullName} | ${data.phone}`;
                 }
             }

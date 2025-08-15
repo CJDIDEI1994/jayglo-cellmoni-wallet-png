@@ -16,8 +16,8 @@ if (!fs.existsSync("uploads")) fs.mkdirSync("uploads");
 
 // File upload configuration
 const storage = multer.diskStorage({
-  destination: (req, file, cb) => cb(null, "uploads/"),
-  filename: (req, file, cb) => cb(null, Date.now() + "-" + file.originalname),
+    destination: (req, file, cb) => cb(null, "uploads/"),
+    filename: (req, file, cb) => cb(null, Date.now() + "-" + file.originalname),
 });
 const upload = multer({ storage });
 
@@ -30,63 +30,64 @@ app.get("/", (req, res) => res.redirect("/login.html"));
 
 // Registration
 app.post("/register", upload.fields([{ name: "profilePhoto" }, { name: "idPhoto" }]), (req, res) => {
-  const { fullName, phone, password, confirmPassword } = req.body;
-  const profilePhoto = req.files["profilePhoto"] ? req.files["profilePhoto"][0].filename : "";
-  const idPhoto = req.files["idPhoto"] ? req.files["idPhoto"][0].filename : "";
+    const { fullName, phone, password, confirmPassword } = req.body;
+    const profilePhoto = req.files["profilePhoto"] ? req.files["profilePhoto"][0].filename : "";
+    const idPhoto = req.files["idPhoto"] ? req.files["idPhoto"][0].filename : "";
 
-  if (!fullName || !phone || !password || !confirmPassword || !profilePhoto || !idPhoto) {
-    return res.json({ success: false, message: "All fields required" });
-  }
+    if (!fullName || !phone || !password || !confirmPassword || !profilePhoto || !idPhoto) {
+        return res.json({ success: false, message: "All fields required" });
+    }
+    if (password !== confirmPassword) return res.json({ success: false, message: "Passwords do not match" });
+    if (users.find(u => u.phone === phone)) return res.json({ success: false, message: "User already exists" });
 
-  if (password !== confirmPassword) return res.json({ success: false, message: "Passwords do not match" });
-
-  if (users.find(u => u.phone === phone)) return res.json({ success: false, message: "User already exists" });
-
-  users.push({ fullName, phone, password, profilePhoto, idPhoto });
-  res.json({ success: true, message: "Registration successful!" });
+    users.push({ fullName, phone, password, profilePhoto, idPhoto });
+    res.json({ success: true, message: "Registration successful!" });
 });
 
 // Login
 app.post("/login", (req, res) => {
-  const { phone, password } = req.body;
-  const user = users.find(u => u.phone === phone && u.password === password);
-  if (user) res.json({ success: true, message: "Login successful!" });
-  else res.json({ success: false, message: "Invalid credentials" });
+    const { phone, password } = req.body;
+    const user = users.find(u => u.phone === phone && u.password === password);
+    if (user) res.json({ success: true, message: "Login successful!" });
+    else res.json({ success: false, message: "Invalid credentials" });
 });
 
-// Serve user info
+// Get single user info
 app.get("/getUser", (req, res) => {
-  const { phone } = req.query;
-  const user = users.find(u => u.phone === phone);
-  if(user) res.json({ success: true, fullName: user.fullName, phone: user.phone, profilePhoto: user.profilePhoto });
-  else res.json({ success: false, message: "User not found" });
+    const { phone } = req.query;
+    const user = users.find(u => u.phone === phone);
+    if (user) res.json({ success: true, fullName: user.fullName, phone: user.phone, profilePhoto: user.profilePhoto });
+    else res.json({ success: false, message: "User not found" });
 });
 
-// Transaction endpoints
-app.post("/deposit", upload.single("depositProof"), (req,res)=>{
-  const { bank, cellmoniNumber, amount } = req.body;
-  const proof = req.file ? req.file.filename : "";
-  if (!bank || !cellmoniNumber || !amount || !proof) return res.json({ success: false, message: "All fields required" });
-  transactions.push({ type: "Deposit", bank, cellmoniNumber, amount, proof, status:"Pending", date: new Date() });
-  res.json({ success:true, message:`Deposit K${amount} received!`});
+// Deposit
+app.post("/deposit", upload.single("depositProof"), (req, res) => {
+    const { bank, cellmoniNumber, amount } = req.body;
+    const proof = req.file ? req.file.filename : "";
+    if (!bank || !cellmoniNumber || !amount || !proof) return res.json({ success: false, message: "All fields required" });
+
+    transactions.push({ type: "Deposit", bank, cellmoniNumber, amount, proof, status: "Pending", date: new Date() });
+    res.json({ success: true, message: `Deposit received: K${amount}` });
 });
 
-app.post("/withdraw", upload.single("withdrawProof"), (req,res)=>{
-  const { bank, accountNumber, amount } = req.body;
-  const proof = req.file ? req.file.filename : "";
-  if (!bank || !accountNumber || !amount || !proof) return res.json({ success: false, message: "All fields required" });
-  transactions.push({ type:"Withdraw", bank, accountNumber, amount, proof, status:"Pending", date: new Date() });
-  res.json({ success:true, message:`Withdrawal K${amount} received!`});
+// Withdraw
+app.post("/withdraw", upload.single("withdrawProof"), (req, res) => {
+    const { bank, accountNumber, amount } = req.body;
+    const proof = req.file ? req.file.filename : "";
+    if (!bank || !accountNumber || !amount || !proof) return res.json({ success: false, message: "All fields required" });
+
+    transactions.push({ type: "Withdraw", bank, accountNumber, amount, proof, status: "Pending", date: new Date() });
+    res.json({ success: true, message: `Withdrawal received: K${amount}` });
 });
 
 // Transaction history
-app.get("/history",(req,res)=>res.json(transactions));
+app.get("/history", (req, res) => res.json(transactions));
 
-// Serve success page
-app.get("/success.html", (req,res)=>res.sendFile(path.join(__dirname,"public","success.html")));
+// Success page
+app.get("/success.html", (req, res) => res.sendFile(path.join(__dirname, "public", "success.html")));
 
-// 404 handler
-app.use((req,res)=>res.status(404).send("Page not found"));
+// 404
+app.use((req, res) => res.status(404).send("Page not found"));
 
 // Start server
-app.listen(PORT, ()=>console.log(`✅ Jayglo CellMoni Agent running on port ${PORT}`));
+app.listen(PORT, () => console.log(`✅ Jayglo CellMoni Agent running on port ${PORT}`));

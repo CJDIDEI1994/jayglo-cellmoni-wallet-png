@@ -9,7 +9,7 @@
 <body>
 
 <div class="header">
-    <h1 class="header-title">19070 Jayglo CellMoni Agent</h1>
+    <h1 class="header-title">Jayglo CellMoni Agent</h1>
 </div>
 
 <marquee class="promo-banner" behavior="scroll" direction="left">
@@ -21,7 +21,7 @@
     <a href="deposit.html">Deposit</a>
     <a href="withdraw.html" class="active">Withdraw</a>
     <a href="history.html">History</a>
-    <a href="index.html">Logout</a>
+    <a href="#" id="logoutBtn">Logout</a>
 </nav>
 
 <div class="form-container">
@@ -62,7 +62,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     withdrawForm.addEventListener("submit", async (e) => {
         e.preventDefault();
-        messageDiv.innerHTML = ""; // clear previous messages
+        messageDiv.innerHTML = "";
 
         const formData = new FormData(withdrawForm);
 
@@ -72,15 +72,10 @@ document.addEventListener("DOMContentLoaded", () => {
                 body: formData
             });
 
-            if (!res.ok) {
-                messageDiv.innerHTML = "<span style='color:red; font-weight:bold;'>Server error! Please try again later.</span>";
-                return;
-            }
-
             const data = await res.json();
 
             if (data.success) {
-                // Redirect to a general success page with type=withdraw
+                // Redirect to general success page
                 window.location.href = "success.html?type=withdraw";
             } else {
                 messageDiv.innerHTML = `<span style='color:red; font-weight:bold;'>${data.message}</span>`;
@@ -89,6 +84,13 @@ document.addEventListener("DOMContentLoaded", () => {
             console.error(err);
             messageDiv.innerHTML = "<span style='color:red; font-weight:bold;'>Network error! Check your internet or backend server.</span>";
         }
+    });
+
+    // Logout button
+    document.getElementById("logoutBtn").addEventListener("click", e=>{
+        e.preventDefault();
+        localStorage.removeItem("loggedInUser");
+        window.location.href = "login.html";
     });
 });
 </script>

@@ -6,96 +6,129 @@
 <title>Dashboard - Jayglo CellMoni Agent</title>
 <link rel="stylesheet" href="css/style.css" />
 <style>
-  .dash-actions {
-    display: flex;
-    gap: 14px;
-    flex-wrap: wrap;
-    justify-content: center;
-    margin-top: 18px;
-  }
-  .dash-actions .circle-btn {
-    width: 78px;
-    height: 78px;
-    border-radius: 50%;
-    border: none;
-    background-color: #ff4d4d;
-    color: #fff;
-    font-size: 12px;
-    font-weight: 700;
-    line-height: 1.1;
-    padding: 8px;
-    cursor: pointer;
-    position: relative;
-    transition: background-color 0.25s ease, transform 0.06s ease;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
-  }
-  .dash-actions .circle-btn:active { transform: scale(0.98); }
-  .dash-actions .circle-btn.loading {
-    background-color: #b30000;
-    pointer-events: none;
-  }
-  .dash-actions .circle-btn .spinner {
-    border: 3px solid rgba(255,255,255,0.35);
-    border-top: 3px solid #fff;
-    border-radius: 50%;
-    width: 20px; height: 20px;
-    animation: dashSpin 1s linear infinite;
-    position: absolute;
-    top: calc(50% - 10px);
-    left: calc(50% - 10px);
-  }
-  @keyframes dashSpin { from { transform: rotate(0); } to { transform: rotate(360deg); } }
-
-  .live-stats { margin-top:20px; text-align:center; font-size:16px; font-weight:600; }
-  .testimonials { margin-top:12px; font-size:14px; color:#333; text-align:center; }
+  body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background:#f9f9f9; margin:0; padding:0; }
+  
+  /* Header */
   .header {
     display:flex;
     justify-content:space-between;
     align-items:center;
-    padding:12px 20px;
+    padding:14px 20px;
     background-color:#ff4d4d;
     color:white;
     position:sticky;
     top:0;
     z-index:1000;
+    box-shadow:0 2px 6px rgba(0,0,0,0.2);
   }
-  .footer { text-align:center; margin-top:20px; padding:12px; font-weight:600; color:#333; }
-  button.top-btn { background:#ff4d4d; color:white; font-weight:600; padding:6px 12px; border:none; border-radius:4px; cursor:pointer; margin-left:6px; }
+  .header h1 { margin:0; font-size:22px; font-weight:700; }
+  .top-btn { background:#fff;color:#ff4d4d;font-weight:600;padding:6px 12px;border:none;border-radius:6px;cursor:pointer;margin-left:6px; transition:0.3s; }
+  .top-btn:hover { background:#ffe5e5; }
+
+  /* User greeting */
+  .form-container { padding:20px; text-align:center; }
+  #user-name { font-size:20px; font-weight:600; margin-bottom:6px; color:#333; }
+  .welcome-msg { font-size:18px; margin-top:0; color:#555; }
+
+  /* Action buttons */
+  .dash-actions {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin:20px 0;
+  }
+  .dash-actions .circle-btn {
+    width:80px;
+    height:80px;
+    border-radius:50%;
+    border:none;
+    background-color:#ff4d4d;
+    color:#fff;
+    font-size:12px;
+    font-weight:700;
+    line-height:1.1;
+    padding:8px;
+    cursor:pointer;
+    position:relative;
+    transition: transform 0.1s ease, background-color 0.25s ease;
+    box-shadow:0 3px 10px rgba(0,0,0,0.2);
+  }
+  .dash-actions .circle-btn:active { transform: scale(0.96); }
+  .dash-actions .circle-btn.loading { background-color:#b30000; pointer-events:none; }
+  .dash-actions .circle-btn .spinner {
+    border:3px solid rgba(255,255,255,0.35);
+    border-top:3px solid #fff;
+    border-radius:50%;
+    width:22px;
+    height:22px;
+    animation:dashSpin 1s linear infinite;
+    position:absolute;
+    top:calc(50% - 11px);
+    left:calc(50% - 11px);
+  }
+  @keyframes dashSpin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+
+  /* Live stats */
+  .live-stats { font-size:16px; font-weight:600; color:#333; margin-top:20px; }
+
+  /* Testimonials */
+  .testimonials {
+    margin-top:16px;
+    font-size:14px;
+    color:#444;
+    background:#fff0f0;
+    padding:10px 12px;
+    border-radius:6px;
+    box-shadow:0 2px 6px rgba(0,0,0,0.1);
+    overflow:hidden;
+  }
+  .testimonials marquee { font-size:14px; color:#555; }
+
+  /* Footer */
+  .footer {
+    text-align:center;
+    padding:14px;
+    font-weight:600;
+    color:#333;
+    background:#ffe5e5;
+    margin-top:30px;
+    border-top:1px solid #ffcccc;
+  }
 </style>
 </head>
 <body>
 
 <!-- Header -->
 <div class="header">
-  <h1 style="margin:0;font-size:20px;">JAYGLO CELLMONI AGENT</h1>
+  <h1>JAYGLO CELLMONI AGENT</h1>
   <div>
     <button class="top-btn" id="agentBtn">AGENT</button>
     <button class="top-btn" id="logoutBtn">Logout</button>
   </div>
 </div>
 
-<div class="form-container" style="padding:20px;">
-  <!-- User Name -->
-  <h2 id="user-name" style="margin-bottom:8px;font-size:18px;">Loading user...</h2>
-  <h2 style="margin-top:0;">Welcome to Your Dashboard</h2>
+<!-- Main Content -->
+<div class="form-container">
+  <h2 id="user-name">Loading user...</h2>
+  <h2 class="welcome-msg">Welcome to Your Dashboard</h2>
 
-  <!-- Action Buttons -->
+  <!-- Quick Action Buttons -->
   <div class="dash-actions" aria-label="Quick actions">
     <button class="circle-btn" data-target="deposit.html">Deposit</button>
     <button class="circle-btn" data-target="withdraw.html">Withdraw</button>
     <button class="circle-btn" data-target="history.html">History</button>
-    <button class="circle-btn" data-target="https://wa.me/71634839" data-external="1">Customer<br/>Service</button>
+    <button class="circle-btn" data-target="https://wa.me/71634839" data-external="1">Customer<br>Service</button>
   </div>
 
-  <!-- Live Active Users -->
-  <div class="live-stats">
-    Active Users: <span id="activeUsers">0</span>
-  </div>
+  <!-- Live Users -->
+  <div class="live-stats">Active Users: <span id="activeUsers">0</span></div>
 
   <!-- Testimonials -->
   <div class="testimonials">
     <marquee behavior="scroll" direction="left" scrollamount="4" id="testimonials">
-      Welcome to Jayglo! Fast deposits & withdrawals across PNG! | Trusted by hundreds of users every day!
+      <!-- Example static testimonials -->
+      John M., Port Moresby: Great service! | Mary K., Lae: Fast deposits! | Peter T., Madang: Trusted and reliable! | Linda R., Mount Hagen: Easy withdrawals! | Samuel W., Kimbe: Excellent customer support!
     </marquee>
   </div>
 </div>
@@ -110,79 +143,68 @@
 (function() {
   const loggedUser = localStorage.getItem("loggedInUser");
   const userNameEl = document.getElementById("user-name");
-  if (!loggedUser) { window.location.href = "login.html"; return; }
+  if(!loggedUser) { window.location.href="login.html"; return; }
 
-  // Load user name
-  fetch("/getUser?phone=" + encodeURIComponent(loggedUser))
-    .then(r => r.json())
-    .then(data => {
-      if(data.success && userNameEl) userNameEl.textContent = data.fullName;
-      else if(userNameEl) userNameEl.textContent = loggedUser;
-    }).catch(() => { if(userNameEl) userNameEl.textContent = loggedUser; });
+  // Load user name dynamically
+  fetch("/getUser?phone="+encodeURIComponent(loggedUser))
+    .then(r=>r.json())
+    .then(d=>{
+      if(d.success && userNameEl) userNameEl.textContent=d.fullName;
+      else if(userNameEl) userNameEl.textContent=loggedUser;
+    }).catch(()=>{ if(userNameEl) userNameEl.textContent=loggedUser; });
 
-  // Live users
-  let usersCount = 120;
-  const activeEl = document.getElementById("activeUsers");
+  // Active Users Counter
+  let usersCount=120;
+  const activeEl=document.getElementById("activeUsers");
   if(activeEl){
-    activeEl.textContent = usersCount;
-    setInterval(() => {
-      usersCount += Math.floor(Math.random()*3) - 1;
+    activeEl.textContent=usersCount;
+    setInterval(()=>{
+      usersCount += Math.floor(Math.random()*3)-1;
       if(usersCount<0) usersCount=0;
-      activeEl.textContent = usersCount;
-    }, 2000);
+      activeEl.textContent=usersCount;
+    },2000);
   }
 
-  // Load testimonials dynamically
-  fetch("/testimonials")
-    .then(r => r.json())
-    .then(list => {
-      const marq = document.getElementById("testimonials");
-      if(Array.isArray(list) && list.length && marq){
-        marq.textContent = list.map(t => `${t.name}: ${t.message}`).join(" | ");
-      }
-    }).catch(()=>{});
-
-  // All buttons loading animation
-  function addLoading(btn, redirect=null, external=false) {
+  // Dashboard buttons loading animation
+  function addLoading(btn, redirect=null, external=false){
     btn.addEventListener("click", ()=>{
-      const label = btn.textContent;
-      btn.textContent = "";
+      const label=btn.textContent;
+      btn.textContent="";
       btn.classList.add("loading");
-      const spin = document.createElement("div");
-      spin.className = "spinner";
+      const spin=document.createElement("div");
+      spin.className="spinner";
       btn.appendChild(spin);
-
       setTimeout(()=>{
         if(external) window.open(redirect,"_blank");
-        else if(redirect) window.location.href = redirect;
+        else if(redirect) window.location.href=redirect;
         else {
           btn.removeChild(spin);
           btn.classList.remove("loading");
-          btn.textContent = label;
+          btn.textContent=label;
         }
-      }, 600);
+      },600);
     });
   }
 
   // Top buttons
-  const agentBtn = document.getElementById("agentBtn");
-  if(agentBtn) addLoading(agentBtn, "dashboard.html");
+  const agentBtn=document.getElementById("agentBtn");
+  if(agentBtn) addLoading(agentBtn,"dashboard.html");
 
-  const logoutBtn = document.getElementById("logoutBtn");
+  const logoutBtn=document.getElementById("logoutBtn");
   if(logoutBtn){
-    logoutBtn.addEventListener("click", (e)=>{
+    logoutBtn.addEventListener("click",(e)=>{
       e.preventDefault();
       localStorage.removeItem("loggedInUser");
-      window.location.href = "login.html";
+      window.location.href="login.html";
     });
   }
 
-  // Dash actions buttons
-  const btns = document.querySelectorAll(".dash-actions .circle-btn");
-  btns.forEach(btn => {
-    const target = btn.getAttribute("data-target") || "dashboard.html";
-    const external = btn.getAttribute("data-external") === "1";
-    addLoading(btn, target, external);
+  // Dash action buttons
+  const btns=document.querySelectorAll(".dash-actions .circle-btn");
+  btns.forEach(btn=>{
+    const target=btn.getAttribute("data-target")||"dashboard.html";
+    const external=btn.getAttribute("data-external")==="1";
+    addLoading(btn,target,external);
   });
 })();
 </script>

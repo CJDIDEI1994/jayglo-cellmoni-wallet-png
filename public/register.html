@@ -30,10 +30,10 @@
         <label for="confirmPassword">Confirm Password:</label>
         <input type="password" id="confirmPassword" name="confirmPassword" placeholder="Confirm password" required>
 
-        <label for="profilePhoto">Profile Photo:</label>
-        <input type="file" id="profilePhoto" name="profilePhoto" accept="image/*" required>
+        <label for="facePhoto">Upload Face Photo:</label>
+        <input type="file" id="facePhoto" name="facePhoto" accept="image/*" required>
 
-        <label for="idPhoto">ID Picture:</label>
+        <label for="idPhoto">Upload ID:</label>
         <input type="file" id="idPhoto" name="idPhoto" accept="image/*" required>
 
         <button type="submit" class="submit-btn">Register</button>
@@ -48,6 +48,41 @@
     </a>
 </div>
 
-<script src="js/app.js"></script>
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+    const registerForm = document.getElementById("registerForm");
+    const messageDiv = document.getElementById("message");
+
+    registerForm.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        messageDiv.innerText = "";
+
+        const formData = new FormData(registerForm);
+
+        // Password confirmation check
+        if(formData.get("password") !== formData.get("confirmPassword")){
+            messageDiv.innerText = "Passwords do not match!";
+            return;
+        }
+
+        try {
+            const res = await fetch("/register", {
+                method: "POST",
+                body: formData
+            });
+            const data = await res.json();
+            if(data.success){
+                alert("Registration successful! Please login.");
+                window.location.href = "login.html";
+            } else {
+                messageDiv.innerText = data.message;
+            }
+        } catch(err){
+            console.error(err);
+            messageDiv.innerText = "Error submitting registration.";
+        }
+    });
+});
+</script>
 </body>
 </html>

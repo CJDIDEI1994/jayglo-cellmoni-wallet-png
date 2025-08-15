@@ -3,108 +3,199 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>History - Jayglo</title>
+<title>Dashboard - Jayglo CellMoni Agent</title>
 <link rel="stylesheet" href="css/style.css">
 <style>
-.table-container {
-    max-width: 900px;
-    margin: 20px auto;
+/* Dashboard layout */
+.header {
+    background-color: #ff4d4d;
+    color: white;
     padding: 15px;
+    text-align: center;
+}
+.navbar {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin: 10px 0;
+}
+.navbar a {
+    text-decoration: none;
+    padding: 8px 16px;
     background-color: #ffe6e6;
-    border-radius: 10px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    border-radius: 5px;
+    color: #000;
+    font-weight: bold;
+}
+.navbar a.active {
+    background-color: #ff4d4d;
+    color: white;
+}
+.section {
+    display: none;
+    margin: 20px auto;
+    max-width: 900px;
+}
+.section.active {
+    display: block;
+}
+#user-info {
+    text-align: center;
+    margin: 10px 0;
+}
+.submit-btn {
+    background-color: #ff4d4d;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    cursor: pointer;
+    border-radius: 5px;
+}
+.whatsapp-btn {
+    background-color: #25D366;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+.table-container {
     overflow-x: auto;
 }
 .transaction-table {
     width: 100%;
     border-collapse: collapse;
-    font-size: 16px;
 }
 .transaction-table th,
 .transaction-table td {
-    padding: 12px 15px;
+    padding: 10px;
     text-align: center;
     border: 1px solid #ff4d4d;
 }
 .transaction-table th {
     background-color: #ff4d4d;
     color: white;
-    font-weight: bold;
 }
-.transaction-table td {
-    background-color: #fff;
-}
-.status-pending {
-    color: #cc0000;
-    font-weight: bold;
-}
-.status-approved {
-    color: green;
-    font-weight: bold;
-}
-@media (max-width: 600px) {
-    .transaction-table th,
-    .transaction-table td {
-        padding: 8px 10px;
-        font-size: 14px;
-    }
-}
+.status-pending { color: #cc0000; font-weight:bold; }
+.status-approved { color: green; font-weight:bold; }
 </style>
-<script>
-async function loadHistory() {
-    const res = await fetch('/history');
-    const data = await res.json();
-    const tableBody = document.getElementById('history-body');
-
-    tableBody.innerHTML = ""; // clear previous rows
-
-    data.forEach(t => {
-        const account = t.accountNumber || t.cellmoniNumber || "-";
-        const status = t.status || "Pending";
-
-        const row = document.createElement('tr');
-        row.innerHTML = `
-            <td>${t.type}</td>
-            <td>${t.amount}</td>
-            <td>${t.proof || "-"}</td>
-            <td>${t.bank || "-"}</td>
-            <td>${account}</td>
-            <td>${new Date(t.date).toLocaleString()}</td>
-            <td class="status-${status.toLowerCase()}">${status}</td>
-        `;
-        tableBody.appendChild(row);
-    });
-}
-
-window.onload = loadHistory;
-</script>
 </head>
 <body>
-<div class="header"><h1>Transaction History</h1></div>
 
-<marquee class="promo-banner" behavior="scroll">All your transactions are listed below!</marquee>
+<div class="header"><h1>Jayglo CellMoni Agent Dashboard</h1></div>
 
-<div class="table-container">
-<table class="transaction-table">
-<thead>
-<tr>
-<th>Type</th>
-<th>Amount (K)</th>
-<th>Proof</th>
-<th>Bank</th>
-<th>Account</th>
-<th>Date</th>
-<th>Status</th>
-</tr>
-</thead>
-<tbody id="history-body">
-<!-- Transactions loaded here dynamically -->
-</tbody>
-</table>
+<div id="user-info"></div>
+
+<div class="navbar">
+    <a href="#" class="nav-link active" data-section="history-section">History</a>
+    <a href="#" class="nav-link" data-section="deposit-section">Deposit</a>
+    <a href="#" class="nav-link" data-section="withdraw-section">Withdraw</a>
+    <a href="#" id="customer-service">Customer Service</a>
+    <a href="#" id="logoutBtn">Logout</a>
 </div>
 
-<div class="footer">
-<button onclick="window.location.href='dashboard.html'" class="submit-btn">Back to Dashboard</button>
+<!-- History Section -->
+<div class="section active" id="history-section">
+    <h2>Transaction History</h2>
+    <div class="table-container">
+        <table class="transaction-table">
+            <thead>
+                <tr>
+                    <th>Type</th>
+                    <th>Amount (K)</th>
+                    <th>Proof</th>
+                    <th>Bank</th>
+                    <th>Account</th>
+                    <th>Date</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody id="history-body"></tbody>
+        </table>
+    </div>
 </div>
+
+<!-- Deposit Section -->
+<div class="section" id="deposit-section">
+    <h2>Deposit Funds</h2>
+    <form id="depositForm" enctype="multipart/form-data">
+        <label for="bank">Select Bank:</label>
+        <select id="bank" name="bank" required>
+            <option value="">-- Select Bank --</option>
+            <option value="BSP">Bank of South Pacific (BSP)</option>
+            <option value="KINA">Kina Bank</option>
+        </select>
+
+        <div id="bankDetails"></div>
+
+        <label for="cellmoniNumber">Your 8-digit CellMoni Number:</label>
+        <input type="text" id="cellmoniNumber" name="cellmoniNumber" maxlength="8" placeholder="Enter your CellMoni number" required>
+
+        <label for="amount">Amount (PGK):</label>
+        <input type="number" id="amount" name="amount" placeholder="Enter amount in PGK" required>
+
+        <label for="depositProof">Upload Payment Proof:</label>
+        <input type="file" id="depositProof" name="depositProof" accept="image/*" required>
+
+        <button type="submit" class="submit-btn">Submit Deposit</button>
+    </form>
+    <div id="deposit-message"></div>
+</div>
+
+<!-- Withdraw Section -->
+<div class="section" id="withdraw-section">
+    <h2>Withdraw Funds</h2>
+    <form id="withdrawForm" enctype="multipart/form-data">
+        <label for="withdrawBank">Select Bank:</label>
+        <select id="withdrawBank" name="bank" required>
+            <option value="">--Choose Bank--</option>
+            <option value="BSP">Bank of South Pacific (BSP)</option>
+            <option value="KINA">Kina Bank</option>
+        </select>
+
+        <label for="accountNumber">Your Bank Account Number:</label>
+        <input type="text" id="accountNumber" name="accountNumber" placeholder="Enter your bank account number" required>
+
+        <label for="withdrawAmount">Withdrawal Amount (PGK):</label>
+        <input type="number" id="withdrawAmount" name="amount" placeholder="Enter amount in PGK" required>
+
+        <label for="withdrawProof">Upload CellMoni Withdrawal Proof:</label>
+        <input type="file" id="withdrawProof" name="withdrawProof" accept="image/*" required>
+
+        <button type="submit" class="submit-btn">Submit Withdrawal</button>
+    </form>
+    <div id="withdraw-message"></div>
+</div>
+
+<script src="js/app.js"></script>
+<script>
+// ================= Navbar Section Switching =================
+const navLinks = document.querySelectorAll('.nav-link');
+navLinks.forEach(link=>{
+    link.addEventListener('click', e=>{
+        e.preventDefault();
+        document.querySelectorAll('.section').forEach(sec=>sec.classList.remove('active'));
+        const target = document.getElementById(link.dataset.section);
+        if(target) target.classList.add('active');
+        navLinks.forEach(l=>l.classList.remove('active'));
+        link.classList.add('active');
+    });
+});
+
+// ================= Deposit Bank Details =================
+const bankSelect = document.getElementById("bank");
+const bankDetails = document.getElementById("bankDetails");
+bankSelect.addEventListener("change", () => {
+    if(bankSelect.value === "BSP") bankDetails.innerHTML = "<p>BSP Account: <strong>CONRAD JUNIOR DIDEI</strong> ACC: 7015320505</p>";
+    else if(bankSelect.value === "KINA") bankDetails.innerHTML = "<p>Kina Bank Account: <strong>CONRAD JUNIOR DIDEI</strong> ACC: 30066515</p>";
+    else bankDetails.innerHTML = "";
+});
+
+// ================= Customer Service =================
+document.getElementById("customer-service").addEventListener("click", e=>{
+    e.preventDefault();
+    window.open("https://wa.me/71634839", "_blank");
+});
+</script>
 </body>
 </html>

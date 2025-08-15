@@ -1,158 +1,22 @@
-<!-- dashboard.html -->
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>Dashboard</title>
-  <link rel="stylesheet" href="styles.css">
-  <style>
-    /* ---------- Basic 2025 style ---------- */
-    body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background-color: #f2f2f2;
-      margin: 0;
-      padding: 0;
-    }
+document.addEventListener("DOMContentLoaded", () => {
 
-    header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 12px 20px;
-      background-color: #ff0000;
-      color: #fff;
-    }
+// ================= Show message ================= function showMessage(msg) { const msgEl = document.getElementById("message"); if (msgEl) msgEl.innerText = msg; }
 
-    #user-info img {
-      width: 40px;
-      height: 40px;
-      border-radius: 50%;
-      margin-right: 8px;
-      vertical-align: middle;
-    }
+// ================= Registration ================= const registerForm = document.getElementById("registerForm"); if (registerForm) { registerForm.addEventListener("submit", e => { e.preventDefault();
+ const fullName = document.getElementById("fullName").value.trim();     const phone = document.getElementById("phone").value.trim();     const password = document.getElementById("password").value.trim();     const confirmPassword = document.getElementById("confirmPassword").value.trim();     const profilePhoto = document.getElementById("profilePhoto").files[0];     const idPhoto = document.getElementById("idPhoto").files[0];      if (!fullName || !phone || !password || !confirmPassword || !profilePhoto || !idPhoto) {       showMessage("All fields are required.");       return;     }     if (password !== confirmPassword) {       showMessage("Passwords do not match.");       return;     }      const formData = new FormData();     formData.append("fullName", fullName);     formData.append("phone", phone);     formData.append("password", password);     formData.append("confirmPassword", confirmPassword);     formData.append("profilePhoto", profilePhoto);     formData.append("idPhoto", idPhoto);      fetch("/register", { method: "POST", body: formData })       .then(res => res.json())       .then(data => {         showMessage(data.message);         if (data.success) {           localStorage.setItem("registerSuccessMessage", data.message);           setTimeout(() => window.location.href = "login.html", 1000);         }       })       .catch(() => showMessage("Error during registration."));   });  
+}
 
-    #logoutBtn {
-      background-color: #fff;
-      color: #ff0000;
-      border: none;
-      padding: 6px 12px;
-      border-radius: 4px;
-      cursor: pointer;
-      font-weight: bold;
-    }
+// ================= Login ================= const loginForm = document.getElementById("loginForm"); if (loginForm) { loginForm.addEventListener("submit", e => { e.preventDefault(); const phone = document.getElementById("phone").value.trim(); const password = document.getElementById("password").value.trim();
+ fetch("/login", {       method: "POST",       headers: { "Content-Type": "application/json" },       body: JSON.stringify({ phone, password })     })       .then(res => res.json())       .then(data => {         showMessage(data.message);         if (data.success) {           localStorage.setItem("loggedInUser", phone);           setTimeout(() => window.location.href = "dashboard.html", 1000);         }       })       .catch(() => showMessage("Error during login."));   });  
+}
 
-    main {
-      padding: 20px;
-    }
+// ================= Registration message on login ================= const regMsg = localStorage.getItem("registerSuccessMessage"); if (regMsg) { showMessage(regMsg); localStorage.removeItem("registerSuccessMessage"); }
 
-    #dashboard-options {
-      display: flex;
-      gap: 16px;
-      margin-bottom: 20px;
-    }
+// ================= Logout ================= const logoutBtn = document.getElementById("logoutBtn"); if (logoutBtn) { logoutBtn.addEventListener("click", e => { e.preventDefault(); localStorage.removeItem("loggedInUser"); window.location.href = "login.html"; }); }
 
-    .dashboard-btn {
-      background-color: #ff0000;
-      color: #fff;
-      border: none;
-      padding: 12px 20px;
-      border-radius: 8px;
-      cursor: pointer;
-      font-size: 16px;
-      transition: all 0.2s ease;
-      position: relative;
-    }
+// ================= Dashboard user info ================= const userPhone = localStorage.getItem("loggedInUser"); if (userPhone) { async function loadUserInfo(phone) { try { const res = await fetch(/getUser?phone=${phone}); const data = await res.json(); if (data.success) { const userInfoEl = document.getElementById("user-info"); if (userInfoEl) { userInfoEl.innerHTML =  <img src="uploads/${data.profilePhoto}" alt="Profile" style="width:40px;height:40px;border-radius:50%;margin-right:8px;vertical-align:middle;">   ${data.fullName} | ${data.phone} ; } } } catch (err) { console.error("Error loading user info:", err); } } loadUserInfo(userPhone); } else { // Redirect to login if not logged in if (window.location.pathname.includes("dashboard") || window.location.pathname.includes("deposit") || window.location.pathname.includes("withdraw") || window.location.pathname.includes("history")) { window.location.href = "login.html"; } }
 
-    .dashboard-btn:active {
-      background-color: #b20000;
-    }
+// ================= Load History ================= async function loadHistory() { const res = await fetch('/history'); const data = await res.json(); const tableBody = document.getElementById('history-body'); if (tableBody) { tableBody.innerHTML = ""; // Clear duplicates data.forEach(t => { const row = document.createElement('tr'); row.innerHTML =  <td>${t.type}</td>   <td>${t.amount}</td>   <td>${t.proof || "-"}</td>   <td>${t.bank || "-"}</td>   <td>${t.accountNumber || t.cellmoniNumber || "-"}</td>   <td>${new Date(t.date).toLocaleString()}</td>   <td class="${t.status.toLowerCase()}">${t.status || "Pending"}</td> ; tableBody.appendChild(row); }); } } if (document.getElementById('history-body')) loadHistory();
 
-    .dashboard-btn .loading {
-      display: none;
-      position: absolute;
-      right: 10px;
-      top: 50%;
-      transform: translateY(-50%);
-    }
+});
 
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      background-color: #fff;
-      border-radius: 8px;
-      overflow: hidden;
-    }
-
-    table th, table td {
-      padding: 12px;
-      border-bottom: 1px solid #ddd;
-      text-align: left;
-    }
-
-    table th {
-      background-color: #ff0000;
-      color: #fff;
-    }
-
-    .pending {
-      color: orange;
-    }
-
-    .approved {
-      color: green;
-    }
-
-    .rejected {
-      color: red;
-    }
-  </style>
-</head>
-<body>
-
-  <!-- Navbar -->
-  <header>
-    <div id="user-info">
-      <img src="images/default-profile.png" alt="Profile"> Loading...
-    </div>
-    <button id="logoutBtn">Logout</button>
-  </header>
-
-  <!-- Dashboard main content -->
-  <main>
-    <section id="dashboard-options">
-      <button class="dashboard-btn" id="depositBtn">
-        Deposit <span class="loading">⏳</span>
-      </button>
-      <button class="dashboard-btn" id="withdrawBtn">
-        Withdraw <span class="loading">⏳</span>
-      </button>
-      <button class="dashboard-btn" id="historyBtn">
-        History <span class="loading">⏳</span>
-      </button>
-      <button class="dashboard-btn" id="customerServiceBtn">
-        Customer Service <span class="loading">⏳</span>
-      </button>
-    </section>
-
-    <!-- History Table -->
-    <table>
-      <thead>
-        <tr>
-          <th>Type</th>
-          <th>Amount</th>
-          <th>Proof</th>
-          <th>Bank</th>
-          <th>Account/CellMoni</th>
-          <th>Date</th>
-          <th>Status</th>
-        </tr>
-      </thead>
-      <tbody id="history-body">
-        <!-- Rows loaded dynamically from app.js -->
-      </tbody>
-    </table>
-  </main>
-
-  <script src="app.js"></script>
-</body>
-</html>

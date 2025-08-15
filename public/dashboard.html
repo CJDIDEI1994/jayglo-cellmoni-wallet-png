@@ -9,7 +9,10 @@
 <body>
 <div class="header" style="display: flex; justify-content: space-between; align-items: center; padding: 12px 20px;">
     <h1>Jayglo CellMoni Agent</h1>
-    <div id="user-info" style="font-size: 16px; font-weight: 500; color: white;"></div>
+    <div id="user-info" style="font-size: 16px; font-weight: 500; color: white; display:flex; align-items:center; gap:10px;">
+        <img id="profilePic" src="" alt="Profile Picture" style="width:40px; height:40px; border-radius:50%; object-fit:cover;">
+        <span id="userName"></span>
+    </div>
 </div>
 
 <marquee class="promo-banner" behavior="scroll" direction="left">
@@ -47,15 +50,19 @@
 const user = localStorage.getItem("loggedInUser");
 if(!user) window.location.href = "login.html";
 
-// Display user full name and CellMoni phone number
-const userInfoDiv = document.getElementById("user-info");
+// Display user full name and profile picture
+const profilePic = document.getElementById("profilePic");
+const userName = document.getElementById("userName");
+
 fetch("/getUser?phone=" + user)
     .then(res => res.json())
     .then(data => {
         if(data.success){
-            userInfoDiv.textContent = `${data.fullName} | ${data.phone}`;
+            userName.textContent = `${data.fullName} | ${data.phone}`;
+            profilePic.src = `uploads/${data.facePhoto}`;
         } else {
-            userInfoDiv.textContent = user;
+            userName.textContent = user;
+            profilePic.style.display = "none";
         }
     });
 

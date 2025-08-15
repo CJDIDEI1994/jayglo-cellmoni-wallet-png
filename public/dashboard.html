@@ -3,90 +3,108 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Dashboard - Jayglo CellMoni Agent</title>
+<title>History - Jayglo</title>
 <link rel="stylesheet" href="css/style.css">
+<style>
+.table-container {
+    max-width: 900px;
+    margin: 20px auto;
+    padding: 15px;
+    background-color: #ffe6e6;
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    overflow-x: auto;
+}
+.transaction-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 16px;
+}
+.transaction-table th,
+.transaction-table td {
+    padding: 12px 15px;
+    text-align: center;
+    border: 1px solid #ff4d4d;
+}
+.transaction-table th {
+    background-color: #ff4d4d;
+    color: white;
+    font-weight: bold;
+}
+.transaction-table td {
+    background-color: #fff;
+}
+.status-pending {
+    color: #cc0000;
+    font-weight: bold;
+}
+.status-approved {
+    color: green;
+    font-weight: bold;
+}
+@media (max-width: 600px) {
+    .transaction-table th,
+    .transaction-table td {
+        padding: 8px 10px;
+        font-size: 14px;
+    }
+}
+</style>
+<script>
+async function loadHistory() {
+    const res = await fetch('/history');
+    const data = await res.json();
+    const tableBody = document.getElementById('history-body');
+
+    tableBody.innerHTML = ""; // clear previous rows
+
+    data.forEach(t => {
+        const account = t.accountNumber || t.cellmoniNumber || "-";
+        const status = t.status || "Pending";
+
+        const row = document.createElement('tr');
+        row.innerHTML = `
+            <td>${t.type}</td>
+            <td>${t.amount}</td>
+            <td>${t.proof || "-"}</td>
+            <td>${t.bank || "-"}</td>
+            <td>${account}</td>
+            <td>${new Date(t.date).toLocaleString()}</td>
+            <td class="status-${status.toLowerCase()}">${status}</td>
+        `;
+        tableBody.appendChild(row);
+    });
+}
+
+window.onload = loadHistory;
+</script>
 </head>
 <body>
-<div class="header" style="display: flex; justify-content: space-between; align-items: center; padding: 12px 20px;">
-    <h1>Jayglo CellMoni Agent</h1>
-    <div id="user-info" style="font-size: 16px; font-weight: 500; color: white; display:flex; align-items:center; gap:10px;">
-        <img id="profilePic" src="" alt="Profile Picture" style="width:40px; height:40px; border-radius:50%; object-fit:cover;">
-        <span id="userName"></span>
-    </div>
-</div>
+<div class="header"><h1>Transaction History</h1></div>
 
-<marquee class="promo-banner" behavior="scroll" direction="left">
-    Baim 5GB data long K5 tasol wantaim CellMoni | Pay water bill, PNG Air ticket, 100% bonus topup | Dial *888#
-</marquee>
+<marquee class="promo-banner" behavior="scroll">All your transactions are listed below!</marquee>
 
-<nav>
-    <a href="dashboard.html">Dashboard</a>
-    <a href="deposit.html">Deposit</a>
-    <a href="withdraw.html">Withdraw</a>
-    <a href="history.html">History</a>
-    <a href="#" id="logoutBtn">Logout</a>
-</nav>
-
-<div class="form-container">
-    <h2>Welcome to Your Dashboard</h2>
-    <div class="live-stats">
-        Active Users: <span id="activeUsers">0</span>
-    </div>
-    <div class="testimonials">
-        <marquee behavior="scroll" direction="left" scrollamount="4" id="testimonials">
-            Welcome to Jayglo! Fast deposits & withdrawals across PNG! | Trusted by hundreds of users every day!
-        </marquee>
-    </div>
+<div class="table-container">
+<table class="transaction-table">
+<thead>
+<tr>
+<th>Type</th>
+<th>Amount (K)</th>
+<th>Proof</th>
+<th>Bank</th>
+<th>Account</th>
+<th>Date</th>
+<th>Status</th>
+</tr>
+</thead>
+<tbody id="history-body">
+<!-- Transactions loaded here dynamically -->
+</tbody>
+</table>
 </div>
 
 <div class="footer">
-    <a href="https://wa.me/71634839" target="_blank">
-        <button class="whatsapp-btn">Contact Customer Service</button>
-    </a>
+<button onclick="window.location.href='dashboard.html'" class="submit-btn">Back to Dashboard</button>
 </div>
-
-<script src="js/app.js"></script>
-<script>
-const user = localStorage.getItem("loggedInUser");
-if(!user) window.location.href = "login.html";
-
-// Display user full name and profile picture
-const profilePic = document.getElementById("profilePic");
-const userName = document.getElementById("userName");
-
-fetch("/getUser?phone=" + user)
-    .then(res => res.json())
-    .then(data => {
-        if(data.success){
-            userName.textContent = `${data.fullName} | ${data.phone}`;
-            profilePic.src = `uploads/${data.facePhoto}`;
-        } else {
-            userName.textContent = user;
-            profilePic.style.display = "none";
-        }
-    });
-
-// Active users counter
-let usersCount = 120;
-setInterval(() => {
-    usersCount += Math.floor(Math.random() * 3) - 1;
-    document.getElementById("activeUsers").textContent = usersCount;
-}, 2000);
-
-// Testimonials
-fetch("/testimonials")
-    .then(res => res.json())
-    .then(data => {
-        const marquee = document.getElementById("testimonials");
-        marquee.textContent = data.map(t => `${t.name}: ${t.message}`).join(" | ");
-    });
-
-// Logout button
-document.getElementById("logoutBtn").addEventListener("click", e=>{
-    e.preventDefault();
-    localStorage.removeItem("loggedInUser");
-    window.location.href = "login.html";
-});
-</script>
 </body>
 </html>
